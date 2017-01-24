@@ -7,8 +7,6 @@
 #include<cmath>
 using namespace std;
 typedef long long ll;
-int N;
-int S[Nmax],E[Nmax];
 
 int main(){
 	return 0;

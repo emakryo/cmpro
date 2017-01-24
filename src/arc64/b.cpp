@@ -7,9 +7,14 @@
 #include<cmath>
 using namespace std;
 typedef long long ll;
-int N;
-int S[Nmax],E[Nmax];
+string S;
 
 int main(){
+	cin >> S;
+
+	if((S.size()%2 == 0) != (S[0] == S[S.size()-1]))
+		cout << "Second" << endl;
+	else
+		cout << "First" << endl;
 	return 0;
 }

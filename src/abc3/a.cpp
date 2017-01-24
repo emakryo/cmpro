@@ -8,8 +8,11 @@
 using namespace std;
 typedef long long ll;
 int N;
-int S[Nmax],E[Nmax];
 
 int main(){
+	cin >> N;
+
+	cout << 5000*(N+1) << endl;
+
 	return 0;
 }

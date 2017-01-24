@@ -7,9 +7,11 @@
 #include<cmath>
 using namespace std;
 typedef long long ll;
-int N;
-int S[Nmax],E[Nmax];
 
 int main(){
+	int N;
+	cin >> N;
+	cout << min(N%10==0 ? 100*(N/10) : 100*(N/10+1),
+			100*(N/10)+(N%10)*15) << endl;
 	return 0;
 }
