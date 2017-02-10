@@ -34,7 +34,7 @@ class UnionFind{
 			par[ri] = rj;
 		}
 		else{
-			rnk[rj] = ri;
+			par[rj] = ri;
 		}
 	}
 	bool same(int i, int j){
