@@ -10,6 +10,9 @@ using namespace std;
 typedef long long ll;
 
 int main(){
+	int n;
+	cin >> n;
+	cout << (n%2==0 ? "Blue" : "Red") << endl;
 
 	return 0;
 }
