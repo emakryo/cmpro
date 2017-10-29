@@ -9,6 +9,7 @@ class Bit{
 	Bit(int n) {
 		v = vector<T>(n);
 	}
+	// i must be 0 <= i < n
 	T sum(int i){
 		int s=0;
 		while(i>0){
@@ -17,7 +18,7 @@ class Bit{
 		}
 		return s;
 	}
-
+	// i must be 1 <= i < n
 	void add(int i, T x){
 		while(i <= v.size()){
 			v[i] += x;
