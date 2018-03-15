@@ -19,8 +19,7 @@ ll ext_gcd(ll a, ll b, ll &x, ll &y){
 ll inv_mod(ll x, ll p){
 	ll y,z;
 	ext_gcd(x, p, y, z);
-	while(y < 0) y+=p;
-	return y;
+	return y>=0 ? y : p+(y%p);
 }
 
 ll fact_mod(ll n, ll p, ll &e){
