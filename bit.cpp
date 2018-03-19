@@ -11,7 +11,7 @@ class Bit{
 	}
 	// i must be 0 <= i < n
 	T sum(int i){
-		int s=0;
+		T s=0;
 		while(i>0){
 			s += v[i];
 			i -= i & -i;
