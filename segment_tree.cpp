@@ -15,15 +15,18 @@ class SegmentTree{
 	T def;
 	int n;
 	public:
-	SegmentTree(vector<T> initial_data, T default_value){
+	template<class I>
+	SegmentTree(I first, I last, T default_value){
 		n = 1;
 		def = default_value;
-		while(n < initial_data.size()) n <<= 1;
+		while(n < last-first) n <<= 1;
 		v = vector<T>(2*n-1, default_value);
-		copy(initial_data.begin(), initial_data.end(), v.begin()+n-1);
+		copy(first, last, v.begin()+n-1);
 		for(int i=n-2; i>=0; i--)
 			v[i] = merge(v[2*i+1], v[2*i+2]);
 	}
+	SegmentTree(vector<T> initial_data, T default_value):
+	SegmentTree(initial_data.begin(), initial_data.end(), default_value){}
 	void update(int idx, T val){
 		idx += n-1;
 		v[idx] = val;
@@ -51,11 +54,10 @@ int SegmentTree<int>::merge(int a, int b){
 }
 
 int main(){
-	int a[] = {1,2,6,3,5,9,10};
-	vector<int> v(a, a+sizeof(a));
-	SegmentTree<int> st(v, 1<<30);
-	cout << st.query(0, 3) << endl;
-	cout << st.query(4, 7) << endl;
+	int a[] = {4,2,2,1,5,9,10};
+	SegmentTree<int> st(a, a+sizeof(a)/sizeof(int), 1<<20);
+	cout << st.query(0, 4) << endl;
+	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
 
 	return 0;
 }
