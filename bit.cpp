@@ -20,7 +20,7 @@ class Bit{
 	}
 	// i must be 1 <= i < n
 	void add(int i, T x){
-		while(i <= v.size()){
+		while(i < v.size()){
 			v[i] += x;
 			i += i & -i;
 		}
