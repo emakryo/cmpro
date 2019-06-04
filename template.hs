@@ -1,9 +1,8 @@
-import Data.List
-import Control.Monad
+import Data.Maybe
+import qualified Data.ByteString.Char8 as B
 
-getVals :: Read a => IO [a]
-getVals = getLine >>= (return . map read . words)
-getStrs = getLine >>= (return . words)
+getInts = map f . B.words <$> B.getLine
+    where f = fst . fromJust . B.readInteger
 
 solve = 0
 
