@@ -1,7 +1,7 @@
 #include<iostream>
 using namespace std;
 typedef long long ll;
-ll fact[100];
+ll fact[200000];
 
 // Extended Euclid's greatest common divisor algorithm
 // Find (x, y, g)
@@ -78,7 +78,7 @@ ll comb_mod(ll n, ll m, ll p){
 int main(){
 	ll p = 7;
 	fact[0] = fact[1] = 1;
-	for(int i=2; i<100; i++) fact[i] = fact[i-1]*i%p;
+	for(int i=2; i<200000; i++) fact[i] = fact[i-1]*i%p;
 	cout << comb_mod(13, 3, p) << endl;
 	return 0;
 }
