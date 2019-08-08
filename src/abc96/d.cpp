@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
+typedef long long ll;
 vector<bool> sieve;
 vector<int> primes;
 
@@ -35,8 +36,19 @@ map<int, int> get_factors(int x){
 }
 
 int main(){
-	get_primes(10000000);
-	for(int i=0; i<20; i++) cout << primes[primes.size()-1-i] << endl;
-	for(auto p: get_factors(9999995)) cout << p.first << " " << p.second << endl;
-}
+	int N;
+	cin >> N;
 
+	get_primes(55555);
+
+	vector<int> ans;
+	for(int i=0; i<primes.size(); i++){
+		if(primes[i]%5==1) ans.push_back(primes[i]);
+	}
+
+	for(int i=0; i<N; i++){
+		cout << ans[i] << (i==N-1?'\n':' ');
+	}
+
+	return 0;
+}
