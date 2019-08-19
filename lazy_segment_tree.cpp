@@ -1,39 +1,29 @@
-#include<iostream>
-#include<iomanip>
-#include<vector>
-#include<map>
-#include<queue>
-#include<algorithm>
-#include<cmath>
-#include<cassert>
+#include<bits/stdc++.h>
 #include<boost/variant.hpp>
 using namespace std;
 typedef long long ll;
-typedef vector<boost::variant<ll, int, string, double>> any;
-
-template<typename T> inline void print(const vector<T> &xs){
+typedef vector<boost::variant<bool, ll, int, string, double>> any;
+template<typename T> inline void pr(const vector<T> &xs){
 	for(int i=0; i<xs.size()-1; i++) cout << xs[i] << " ";
 	cout << xs[xs.size()-1] << endl;
 }
 template<typename T> inline void debug(const vector<T> &xs){
 #ifdef DEBUG
-	print(xs);
+	pr(xs);
 #endif
 }
 
-template <class T, class E>
+template <typename T, class E>
 class LazySegmentTree{
 public:
 	vector<T> data, lazy;
 	T def;
 	E lazy_def;
 	int n, height;
-	LazySegmentTree(int n_, T def, E lazy_def):
-	def(def), lazy_def(lazy_def){
+	LazySegmentTree(int n_, T def, E lazy_def): def(def), lazy_def(lazy_def){
 		init(n_);
 	}
-	LazySegmentTree(const vector<T> &v, T def, E lazy_def):
-	def(def), lazy_def(lazy_def){
+	LazySegmentTree(const vector<T> &v, T def, E lazy_def): def(def), lazy_def(lazy_def){
 		int n_ = v.size();
 		init(n_);
 		for(int i=0; i<n_; i++) data[n+i] = v[i];
@@ -63,10 +53,10 @@ public:
 	}
 	void update(int a, int b, E x){
 		thrust(a+=n);
-		thrust(a+=n-1);
+		thrust(b+=n-1);
 		for(int l=a, r=b+1; l<r; l>>=1, r>>=1){
-			if(l&1) lazy[l] = propagete(lazy[l], x), l++;
-			if(r&1) --r, lazy[r]=propagete(lazy[r], x);
+			if(l&1) lazy[l] = propagate(lazy[l], x), l++;
+			if(r&1) --r, lazy[r]=propagate(lazy[r], x);
 		}
 		recalc(a);
 		recalc(b);
@@ -79,7 +69,7 @@ public:
 	}
 	T query(int a, int b){
 		thrust(a+=n);
-		thrust(a+=n-1);
+		thrust(b+=n-1);
 		T vl = def, vr = def;
 		for(int l=a, r=b+1; l<r; l>>=1, r>>=1){
 			if(l&1) vl = merge(vl, reflect(l++));
@@ -87,36 +77,25 @@ public:
 		}
 		return merge(vl, vr);
 	}
-	T merge(T left, T right);
-	E propagate(E before, E change);
-	T apply(T val, E laz);
+
+	// Example (min, add)
+	T merge(T left, T right) { return min(left, right); }
+	E propagate(E before, E change) { return before+change; }
+	T apply(T val, E laz) { return val+laz; }
 };
-
-// Example
-
-template <>
-int LazySegmentTree<int, int>::merge(int left, int right){
-	return min(left, right);
-}
-
-template<>
-int LazySegmentTree<int, int>::apply(int val, int laz){
-	return val+laz;
-}
-
-template<>
-int LazySegmentTree<int, int>::propagate(int before, int change){
-	return before+change;
-}
 
 int main(){
 	vector<int> a({4,2,2,1,5,9,10});
 	LazySegmentTree<int, int> st(a, 1<<20, 0);
 	cout << st.query(0, 4) << endl;
 	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-
-	print(a);
-	print(any{1, "pohe"});
+	st.set(3, 8);
+	cout << st.query(0, 4) << endl;
+	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
+	st.update(2, 6, 8);
+	st.update(5, 7, -3);
+	cout << st.query(0, 4) << endl;
+	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
 
 	return 0;
 }
