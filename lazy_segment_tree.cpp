@@ -6,8 +6,20 @@
 #include<algorithm>
 #include<cmath>
 #include<cassert>
+#include<boost/variant.hpp>
 using namespace std;
 typedef long long ll;
+typedef vector<boost::variant<ll, int, string, double>> any;
+
+template<typename T> inline void print(const vector<T> &xs){
+	for(int i=0; i<xs.size()-1; i++) cout << xs[i] << " ";
+	cout << xs[xs.size()-1] << endl;
+}
+template<typename T> inline void debug(const vector<T> &xs){
+#ifdef DEBUG
+	print(xs);
+#endif
+}
 
 template <class T, class E>
 class LazySegmentTree{
@@ -76,15 +88,25 @@ public:
 		return merge(vl, vr);
 	}
 	T merge(T left, T right);
-	E propagate(E left, E right);
+	E propagate(E before, E change);
 	T apply(T val, E laz);
 };
 
 // Example
 
 template <>
-int LazySegmentTree<int, int>::merge(int a, int b){
-	return min(a, b);
+int LazySegmentTree<int, int>::merge(int left, int right){
+	return min(left, right);
+}
+
+template<>
+int LazySegmentTree<int, int>::apply(int val, int laz){
+	return val+laz;
+}
+
+template<>
+int LazySegmentTree<int, int>::propagate(int before, int change){
+	return before+change;
 }
 
 int main(){
@@ -92,6 +114,9 @@ int main(){
 	LazySegmentTree<int, int> st(a, 1<<20, 0);
 	cout << st.query(0, 4) << endl;
 	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
+
+	print(a);
+	print(any{1, "pohe"});
 
 	return 0;
 }
