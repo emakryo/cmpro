@@ -3,11 +3,10 @@
 using namespace std;
 typedef long long ll;
 typedef vector<boost::variant<bool, ll, int, string, double>> any;
-template<typename T> void pr(const vector<T> &xs){
-	for(int i=0; i<xs.size()-1; i++) cout << xs[i] << " ";
-	cout << xs[xs.size()-1] << endl;
+template<typename T> inline void pr(const vector<T> &xs){
+	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" "; cout<<xs[xs.size()-1]<<endl;
 }
-template<typename T> void debug(const vector<T> &xs){
+template<typename T> inline void debug(const vector<T> &xs){
 #ifdef DEBUG
 	pr(xs);
 #endif
@@ -84,17 +83,29 @@ struct LazySegmentTree{
 };
 
 int main(){
-	vector<int> a({4,2,2,1,5,9,10});
-	LazySegmentTree<int, int> st(a, 1<<20, 0);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-	st.set(3, 8);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-	st.update(2, 6, 8);
-	st.update(5, 7, -3);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
+	int N, Q, A, B;
+	cin >> N >> Q >> A >> B;
+	vector<ll> X(Q+1);
+	X[0] = B;
+	for(int i=0; i<Q; i++) cin >> X[i+1];
 
+	LazySegmentTree<ll, ll> st1(N+1, 1LL<<60, 0), st2(N+1, 1LL<<60, 0);
+	st1.set(A, A);
+	st2.set(A, -A);
+
+	for(int i=0; i<Q; i++){
+		ll t1 = min(st2.query(1, X[i+1])+X[i]+X[i+1], st1.query(X[i+1], N+1)+X[i]-X[i+1]);
+		ll t2 = min(st2.query(1, X[i+1])-X[i]+X[i+1], st1.query(X[i+1], N+1)-X[i]-X[i+1]);
+		debug(any{t1, t2});
+		st1.update(1, N+2, abs(X[i+1]-X[i]));
+		st2.update(1, N+2, abs(X[i+1]-X[i]));
+		st1.set(X[i], min(st1.query(X[i], X[i]+1), t1));
+		st2.set(X[i], min(st2.query(X[i], X[i]+1), t2));
+	}
+	ll ans = 1LL<<60;
+	for(int i=1; i<=N; i++){
+		ans = min(ans, (st1.query(i, i+1)+st2.query(i, i+1))/2);
+	}
+	cout << ans << endl;
 	return 0;
 }
