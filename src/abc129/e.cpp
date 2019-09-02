@@ -14,6 +14,21 @@ template<typename T> inline void debug(const vector<T> &xs){
 }
 
 int main(){
+	string L;
+	const ll P = 1e9+7;
+	cin >> L;
 
+	vector<ll> e3(L.size());
+	e3[0] = 1;
+	for(int i=1; i<L.size(); i++) e3[i] = 3*e3[i-1]%P;
+	ll ans = 1;
+	for(int i=L.size()-1; i>=0; i--){
+		if(L[i]=='1'){
+			ans = 2*ans + e3[L.size()-1-i];
+			ans %= P;
+		}
+	}
+
+	cout << ans << endl;
 	return 0;
 }
