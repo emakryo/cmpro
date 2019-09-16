@@ -1,11 +1,10 @@
 #include<bits/stdc++.h>
 
-// Z array
-// Z[i] = maximum n s.t. str[0..n] == str[i..i+n]
-void getZarray(std::string str, std::vector<int> &Z) {
+// Z array: Z[i] = maximum n s.t. str[0..n] == str[i..i+n]
+std::vector<int> getZarray(std::string str) {
 	int n = str.length();
+	std::vector<int> Z(n);
 	int L, R, k;
-	Z.assign(n, 0);
 	// [L,R] make a window which matches with prefix of s
 	L = R = 0;
 	for (int i=1; i<n; i++) {
@@ -41,4 +40,5 @@ void getZarray(std::string str, std::vector<int> &Z) {
 			}
 		}
 	}
+	return Z;
 }
