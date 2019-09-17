@@ -80,6 +80,7 @@ int main(){
 	ll p = 7;
 	fact[0] = fact[1] = 1;
 	for(int i=2; i<200000; i++) fact[i] = fact[i-1]*i%p;
-	cout << comb_mod(13, 3, p) << endl;
+
+	assert((comb_mod(13, 3, p)==6));
 	return 0;
 }

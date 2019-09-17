@@ -26,33 +26,34 @@ class SCC{
 	}
 
 public:
+	int n;
 	std::vector<std::vector<int> > graph; // original graph
 	std::vector<std::vector<int> > components; // nodes lists for each components
 	std::vector<int> component_index; // index of component to which each node belongs
 	std::vector<std::vector<int> > component_graph; // graph of component index
 
-	SCC(std::vector<std::vector<int> > &g): graph(g){
-		rev_graph.assign(g.size(), {});
+	SCC(std::vector<std::vector<int> > &g): graph(g), n(g.size()){
+		rev_graph.assign(n, {});
 
-		for(int i=0; i<g.size(); i++){
+		for(int i=0; i<n; i++){
 			for(int j=0; j<g[i].size(); j++){
 				rev_graph[g[i][j]].push_back(i);
 			}
 		}
 
-		visited.assign(g.size(), false);
-		for(int i=0; i<g.size(); i++){
+		visited.assign(n, false);
+		for(int i=0; i<n; i++){
 			visit(i);
 		}
 
-		root.assign(g.size(), -1);
-		for(int i=g.size()-1; i>=0; i--){
-			int n = visit_nodes[i];
-			assign(n, n);
+		root.assign(n, -1);
+		for(int i=n-1; i>=0; i--){
+			int m = visit_nodes[i];
+			assign(m, m);
 		}
 
 		std::map<int, std::vector<int> > root_index;
-		for(int i=0; i<g.size(); i++){
+		for(int i=0; i<n; i++){
 			root_index[root[i]].push_back(i);
 		}
 
@@ -68,12 +69,12 @@ public:
 		}
 
 		component_graph.assign(components.size(), {});
-		for(int i=0; i<g.size(); i++){
+		for(int i=0; i<n; i++){
 			for(int j=0; j<g[i].size(); j++){
-				int n = component_index[i];
+				int l = component_index[i];
 				int m = component_index[g[i][j]];
-				if(n == m) continue;
-				component_graph[n].push_back(m);
+				if(l == m) continue;
+				component_graph[l].push_back(m);
 			}
 		}
 
@@ -108,15 +109,30 @@ int main(){
 	g[7].push_back(6);
 	g[8].push_back(9);
 	SCC scc(g);
-	for(int i=0; i<10; i++){
-		cout << i << " " << scc.component_index[i] << endl;
-	}
-	for(int i=0; i<scc.component_graph.size(); i++){
-		cout << i << ": ";
-		for(int j=0; j<scc.component_graph[i].size(); j++){
-			cout << scc.component_graph[i][j] << " ";
-		}
-		cout << endl;
-	}
+
+	assert(scc.component_index[0] == scc.component_index[1]);
+	assert(scc.component_index[0] == scc.component_index[3]);
+	assert(scc.component_index[0] == scc.component_index[4]);
+	assert(scc.component_index[0] != scc.component_index[2]);
+	assert(scc.component_index[2] != scc.component_index[5]);
+	assert(scc.component_index[2] != scc.component_index[6]);
+	assert(scc.component_index[6] == scc.component_index[7]);
+	assert(scc.component_index[7] != scc.component_index[8]);
+	assert(scc.component_index[8] != scc.component_index[9]);
+
+	int c0 = scc.component_index[0];
+	int c2 = scc.component_index[2];
+	int c5 = scc.component_index[5];
+	int c6 = scc.component_index[6];
+	int c8 = scc.component_index[8];
+	int c9 = scc.component_index[9];
+
+	assert((scc.component_graph[c0] == vector<int>{c2, c5}));
+	assert((scc.component_graph[c2] == vector<int>{c5, c6}));
+	assert((scc.component_graph[c5] == vector<int>{c6}));
+	assert((scc.component_graph[c6] == vector<int>{}));
+	assert((scc.component_graph[c8] == vector<int>{c9}));
+	assert((scc.component_graph[c9] == vector<int>{}));
+
 	return 0;
 }

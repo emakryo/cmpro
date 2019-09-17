@@ -17,6 +17,7 @@ std::vector<ll> get_divisors(ll n){
 int main(){
 	using namespace std;
 	auto div = get_divisors(64);
-	for(ll d: div) cout << d << endl;
+	//for(ll d: div) cout << d << endl;
+	assert((div==vector<ll>{1, 2, 4, 8, 16, 32, 64}));
 	return 0;
 }

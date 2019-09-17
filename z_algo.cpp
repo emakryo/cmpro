@@ -1,6 +1,5 @@
 // from https://www.geeksforgeeks.org/z-algorithm-linear-time-pattern-searching-algorithm/
 #include<bits/stdc++.h>
-#include<cassert>
 
 // Z array: Z[i] = maximum n s.t. str[0..n] == str[i..i+n]
 std::vector<int> getZarray(std::string &str) {

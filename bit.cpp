@@ -33,12 +33,12 @@ int main(){
 	Bit<int> bit(10);
 	bit.add(1,10);
 	bit.add(5,20);
-	cout << bit.sum(0) << endl;
-	cout << bit.sum(2) << endl;
-	cout << bit.sum(5) << endl;
-	cout << bit.sum(8) << endl;
+	assert(bit.sum(0)==0);
+	assert(bit.sum(2)==10);
+	assert(bit.sum(5)==30);
+	assert(bit.sum(8)==30);
 
 	vector<int> v = {3, 5, 1, 2, 4};
-	cout << crossing(v) << endl;
+	assert(crossing(v)==5);
 	return 0;
 }

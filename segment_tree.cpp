@@ -45,10 +45,12 @@ int SegmentTree<int>::merge(int a, int b){
 
 int main(){
 	using namespace std;
-	int a[] = {4,2,2,1,5,9,10};
-	SegmentTree<int> st(a, a+sizeof(a)/sizeof(int), 1<<20);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
+	vector<int> a = {4,2,2,1,5,9,10};
+	SegmentTree<int> st(a.begin(), a.end(), 1<<20);
+	assert((st.query(0, 4)==1));
+	for(int i=0; i<10; i++){
+		assert((st.query(i, i+1)==i<a.size()?a[i]:1<<20));
+	}
 
 	return 0;
 }

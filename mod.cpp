@@ -1,3 +1,5 @@
+#include<bits/stdc++.h>
+
 struct mint {
 	typedef long long ll;
 	ll x, m;
@@ -27,4 +29,13 @@ struct mint {
 		mint z = pow(k/2);
 		return z*z;
 	}
+
+	mint inv() const { return pow(m-2); }
 };
+
+int main(){
+	for(auto x: std::vector<int>{3, 5, 7, 11, 13, 17, 19}){
+		assert((mint(4, x)*mint(4, x).inv())==1);
+	}
+	return 0;
+}
