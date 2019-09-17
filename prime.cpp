@@ -1,10 +1,9 @@
 #include<bits/stdc++.h>
-using namespace std;
-vector<bool> sieve;
-vector<int> primes;
+std::vector<bool> sieve;
+std::vector<int> primes;
 
 void eratosthenes(int maximum){
-	sieve = vector<bool>(maximum+1);
+	sieve = std::vector<bool>(maximum+1);
 	sieve[0]=sieve[1]=false;
 	for(int i=2; i<sieve.size(); i++) sieve[i]=true;
 	for(int j=4; j<sieve.size(); j+=2) sieve[j]=false;
@@ -21,8 +20,8 @@ void get_primes(int maximum){
 	}
 }
 
-map<int, int> get_factors(int x){
-	map<int, int> factors;
+std::map<int, int> get_factors(int x){
+	std::map<int, int> factors;
 	for(int p: primes){
 		if(p*p>x) break;
 		while(x%p==0){
@@ -35,6 +34,7 @@ map<int, int> get_factors(int x){
 }
 
 int main(){
+	using namespace std;
 	get_primes(10000000);
 	for(int i=0; i<20; i++) cout << primes[primes.size()-1-i] << endl;
 	for(auto p: get_factors(9999995)) cout << p.first << " " << p.second << endl;

@@ -1,11 +1,10 @@
 #include<bits/stdc++.h>
-using namespace std;
 
 template<typename T>
 struct Point {
 	T x, y;
 	Point(T x=0, T y=0):x(x), y(y) {}
-	Point(pair<T, T> p): x(p.first), y(p.second) {}
+	Point(std::pair<T, T> p): x(p.first), y(p.second) {}
 	Point operator+ (const Point &o) const { return Point(x+o.x, y+o.y); }
 	Point& operator+= (const Point &o){ x += o.x; y += o.y; return *this; }
 	Point operator- (const Point &o) const { return Point(x-o.x, y-o.y); }
@@ -16,10 +15,10 @@ struct Point {
 };
 
 typedef Point<long long> PLL;
-vector<PLL> convex_hull(vector<PLL> &points){
+std::vector<PLL> convex_hull(std::vector<PLL> &points){
 	int n = points.size();
-	sort(points.begin(), points.end());
-	vector<PLL> lower(n), upper(n);
+	std::sort(points.begin(), points.end());
+	std::vector<PLL> lower(n), upper(n);
 	int l = 0, r = 0;
 	for(auto p: points){
 		while(l>1 && (lower[l-1]-lower[l-2]).det(p-lower[l-1]) <= 0) l--;

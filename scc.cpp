@@ -1,15 +1,11 @@
-#include<iostream>
-#include<vector>
-#include<map>
-#include<algorithm>
-using namespace std;
+#include<bits/stdc++.h>
 
 // perform strongly connected component decomposition
 class SCC{
-	vector<bool> visited;
-	vector<vector<int> > rev_graph;
-	vector<int> visit_nodes;
-	vector<int> root;
+	std::vector<bool> visited;
+	std::vector<std::vector<int> > rev_graph;
+	std::vector<int> visit_nodes;
+	std::vector<int> root;
 	// sort nodes by post-order of dfs
 	void visit(int n){
 		if(visited[n]) return;
@@ -30,13 +26,13 @@ class SCC{
 	}
 
 public:
-	vector<vector<int> > graph; // original graph
-	vector<vector<int> > components; // nodes lists for each components
-	vector<int> component_index; // index of component to which each node belongs
-	vector<vector<int> > component_graph; // graph of component index
+	std::vector<std::vector<int> > graph; // original graph
+	std::vector<std::vector<int> > components; // nodes lists for each components
+	std::vector<int> component_index; // index of component to which each node belongs
+	std::vector<std::vector<int> > component_graph; // graph of component index
 
-	SCC(vector<vector<int> > &g): graph(g){
-		rev_graph = vector<vector<int> >(g.size());
+	SCC(std::vector<std::vector<int> > &g): graph(g){
+		rev_graph.assign(g.size(), {});
 
 		for(int i=0; i<g.size(); i++){
 			for(int j=0; j<g[i].size(); j++){
@@ -44,36 +40,34 @@ public:
 			}
 		}
 
-		visited = vector<bool>(g.size());
-		visit_nodes = vector<int>();
+		visited.assign(g.size(), false);
 		for(int i=0; i<g.size(); i++){
 			visit(i);
 		}
 
-		root = vector<int>(g.size(), -1);
+		root.assign(g.size(), -1);
 		for(int i=g.size()-1; i>=0; i--){
 			int n = visit_nodes[i];
 			assign(n, n);
 		}
 
-		map<int, vector<int> > root_index;
+		std::map<int, std::vector<int> > root_index;
 		for(int i=0; i<g.size(); i++){
 			root_index[root[i]].push_back(i);
 		}
 
-		for(map<int, vector<int> >::iterator i=root_index.begin();
-				i!=root_index.end(); i++){
+		for(auto i=root_index.begin(); i!=root_index.end(); i++){
 			components.push_back(i->second);
 		}
 
-		component_index = vector<int>(g.size());
+		component_index.assign(g.size(), 0);
 		for(int i=0; i<components.size(); i++){
 			for(int j=0; j<components[i].size(); j++){
 				component_index[components[i][j]] = i;
 			}
 		}
 
-		component_graph = vector<vector<int> >(components.size());
+		component_graph.assign(components.size(), {});
 		for(int i=0; i<g.size(); i++){
 			for(int j=0; j<g[i].size(); j++){
 				int n = component_index[i];
@@ -85,8 +79,7 @@ public:
 
 		for(int i=0; i<components.size(); i++){
 			sort(component_graph[i].begin(), component_graph[i].end());
-			vector<int>::iterator last;
-			last = unique(component_graph[i].begin(), component_graph[i].end());
+			auto last = unique(component_graph[i].begin(), component_graph[i].end());
 			component_graph[i].resize(last - component_graph[i].begin());
 		}
 	}
@@ -94,6 +87,7 @@ public:
 };
 
 int main(){
+	using namespace std;
 /*
  * 0 -> 1 -> 2 -> 7  8 -> 9
  * ^    |    |    ^

@@ -15,9 +15,9 @@ test case 3
 '
 # When line matches "===", the previous lines are fed to program
 
+export cmd="./a.out"
+export sample="sample.txt"
 run_test() {
-	cmd="./a.out"
-	sample="sample.txt"
 	data=""
 	echo Run $cmd
 	cat $sample | while read line

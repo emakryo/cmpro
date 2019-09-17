@@ -1,34 +1,24 @@
-#include<iostream>
-#include<vector>
-using namespace std;
+#include<bits/stdc++.h>
 
 template <class T>
-class Bit{
-	vector<T> v;
-	public:
-	Bit(int n) {
-		v = vector<T>(n);
-	}
+struct Bit{
+	std::vector<T> v;
+	int n;
+	Bit(int n_): n(n_){ v.assign(n_, 0); }
 	// i must be 0 <= i < n
 	T sum(int i){
 		T s=0;
-		while(i>0){
-			s += v[i];
-			i -= i & -i;
-		}
+		while(i>0){ s += v[i]; i -= i & -i; }
 		return s;
 	}
 	// i must be 1 <= i < n
 	void add(int i, T x){
-		while(i < v.size()){
-			v[i] += x;
-			i += i & -i;
-		}
+		while(i < n){ v[i] += x; i += i & -i; }
 	}
 };
 
 // v: permutation of (1, ... , n)
-int crossing(vector<int> &v){
+int crossing(std::vector<int> &v){
 	Bit<int> bit(v.size()+1);
 	int count = 0;
 	for(int i=0; i<v.size(); i++){
@@ -39,6 +29,7 @@ int crossing(vector<int> &v){
 }
 
 int main(){
+	using namespace std;
 	Bit<int> bit(10);
 	bit.add(1,10);
 	bit.add(5,20);

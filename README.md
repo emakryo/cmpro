@@ -5,7 +5,8 @@ Library for competitive programming
 - `bit.cpp`
 	- Binary indexed tree
 - `combination.cpp`
-	- Combination
+	- Combination of modulo
+	- Factorial of modulo
 - `divisors.cpp`
 	- Divisors of integer
 - `geometry.cpp`

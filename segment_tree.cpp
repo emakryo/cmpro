@@ -1,31 +1,21 @@
-#include<iostream>
-#include<iomanip>
-#include<vector>
-#include<map>
-#include<queue>
-#include<algorithm>
-#include<cmath>
-#include<cassert>
-using namespace std;
-typedef long long ll;
+#include<bits/stdc++.h>
 
 template <class T>
-class SegmentTree{
-	vector<T> v;
+struct SegmentTree{
+	std::vector<T> v;
 	T def;
 	int n;
-	public:
 	template<class I>
 	SegmentTree(I first, I last, T default_value){
 		n = 1;
 		def = default_value;
 		while(n < last-first) n <<= 1;
-		v = vector<T>(2*n-1, default_value);
+		v.assign(2*n-1, default_value);
 		copy(first, last, v.begin()+n-1);
 		for(int i=n-2; i>=0; i--)
 			v[i] = merge(v[2*i+1], v[2*i+2]);
 	}
-	SegmentTree(vector<T> initial_data, T default_value):
+	SegmentTree(std::vector<T> initial_data, T default_value):
 	SegmentTree(initial_data.begin(), initial_data.end(), default_value){}
 	void update(int idx, T val){
 		idx += n-1;
@@ -50,10 +40,11 @@ class SegmentTree{
 
 template <>
 int SegmentTree<int>::merge(int a, int b){
-	return min(a, b);
+	return std::min(a, b);
 }
 
 int main(){
+	using namespace std;
 	int a[] = {4,2,2,1,5,9,10};
 	SegmentTree<int> st(a, a+sizeof(a)/sizeof(int), 1<<20);
 	cout << st.query(0, 4) << endl;

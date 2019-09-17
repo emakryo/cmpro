@@ -1,14 +1,11 @@
-#include<vector>
-#include<iostream>
-using namespace std;
+#include<bits/stdc++.h>
 
-class UnionFind{
-	vector<int> par, rnk, cnt;
-	public:
+struct UnionFind{
+	std::vector<int> par, rnk, cnt;
 	UnionFind(int n){
-		par=vector<int>(n);
-		rnk=vector<int>(n,0);
-		cnt=vector<int>(n,1);
+		par.assign(n, 0);
+		rnk.assign(n, 0);
+		cnt.assign(n, 1);
 		for(int i=0; i<n; i++) par[i]=i;
 	}
 	int root(int i){

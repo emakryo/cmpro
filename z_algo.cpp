@@ -1,7 +1,9 @@
+// from https://www.geeksforgeeks.org/z-algorithm-linear-time-pattern-searching-algorithm/
 #include<bits/stdc++.h>
+#include<cassert>
 
 // Z array: Z[i] = maximum n s.t. str[0..n] == str[i..i+n]
-std::vector<int> getZarray(std::string str) {
+std::vector<int> getZarray(std::string &str) {
 	int n = str.length();
 	std::vector<int> Z(n);
 	int L, R, k;
@@ -41,4 +43,25 @@ std::vector<int> getZarray(std::string str) {
 		}
 	}
 	return Z;
+}
+
+std::vector<int> occurance(std::string &text, std::string &pattern){
+	std::string concat = pattern + "$" + text;
+	int np = pattern.size();
+	std::vector<int> z = getZarray(concat);
+	std::vector<int> idx;
+
+	for(int i=0; i<concat.size()-np-1; i++){
+		if(z[i+np+1] >= np) idx.push_back(i);
+	}
+	return idx;
+}
+
+int main(){
+	using namespace std;
+	string text = "aababaabaacaabaa";
+	string pat = "aab";
+	vector<int> oc = occurance(text, pat);
+	assert((oc==vector<int>{0, 5, 11}));
+	return 0;
 }
