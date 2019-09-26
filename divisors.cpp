@@ -4,7 +4,7 @@ typedef long long ll;
 // list all divisors of n. O(sqrt(n))
 std::vector<ll> get_divisors(ll n){
 	std::vector<ll> div(1, 1);
-	for(int i=2; i*i<=n; i++){
+	for(int i=2; (ll)i*i<=n; i++){
 		if(n%i==0) div.push_back(i);
 	}
 	for(int i=div.size()-1; i>=0; i--){
