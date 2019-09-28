@@ -20,8 +20,8 @@ void get_primes(int maximum){
 	}
 }
 
-std::map<int, int> get_factors(int x){
-	std::map<int, int> factors;
+std::map<long long, int> get_factors(long long x){
+	std::map<long long, int> factors;
 	for(int p: primes){
 		if(p*p>x) break;
 		while(x%p==0){

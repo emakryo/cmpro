@@ -1,157 +1,91 @@
-#include<iostream>
-#include<map>
-#include<vector>
+#include<bits/stdc++.h>
+#include<boost/variant.hpp>
 using namespace std;
-const int Nmax = 400;
-int N, C[4][Nmax];
-
-long encode(int c0,int c1,int c2,int c3){
-	long base=1000;
-	long x = c3+base*c2+base*base*c1+base*base*base*c0;
-	long m = x;
-	for(int i=0; i<3; i++){
-		x = x/base+(x%base)*base*base*base;
-		m = min(m, x);
-	}
-	return m;
+typedef long long ll;
+typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> any;
+template<typename T> inline void pr(const vector<T> &xs){
+	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" ";
+	(xs.empty()?cout:(cout<<xs[xs.size()-1]))<<endl;
+}
+template<typename T> inline void debug(const vector<T> &xs){
+#ifdef DEBUG
+	pr(xs);
+#endif
 }
 
-int rot(long code){
-	int c[4];
-	int base = 1000;
-	for(int i=0; i<4; i++) {
-		c[i] = code%base;
-		code /= base;
+ll canonical(const vector<int> &c){
+	ll x = 1LL<<62;
+	for(int i=0; i<4; i++){
+		ll t = 0;
+		for(int j=0; j<4; j++){
+			t = (t<<10) + c[(i+j)%4];
+		}
+		x = min(x, t);
 	}
-	if(c[0]==c[1]&&c[1]==c[2]&&c[2]==c[3]) return 4;
-	if(c[0]==c[2]&&c[1]==c[3]) return 2;
-	return 1;
+	return x;
+}
+
+int count_greater(const vector<int> &v, int n, int m){
+	auto it = lower_bound(v.begin(), v.end(), n);
+	int x = v.end()-it;
+	if(x>0&&*it==n) x--;
+	if(binary_search(v.begin(), v.end(), m)) x--;
+	return x;
+}
+
+int mul(ll x){
+	ll c0 = (x>>30)&((1<<10)-1);
+	ll c1 = (x>>20)&((1<<10)-1);
+	ll c2 = (x>>10)&((1<<10)-1);
+	ll c3 = (x>>0)&((1<<10)-1);
+	if(c0==c1&&c1==c2&&c2==c3) return 4;
+	if(c0==c2&&c1==c3) return 2;
+	else return 1;
 }
 
 int main(){
+	int N;
 	cin >> N;
+	vector<vector<int>> C(N, vector<int>(4));
+	for(int i=0; i<N; i++) for(int k=0; k<4; k++) cin >> C[i][k];
+
+	map<ll, vector<int>> faces;
 	for(int i=0; i<N; i++){
-		for(int j=0; j<4; j++){
-			cin >> C[j][i];
-		}
+		faces[canonical(C[i])].push_back(i);
 	}
 
-	map<long, vector<int> > e2f;
-	for(int i=0; i<N; i++){
-		long x = encode(C[0][i],C[1][i],C[2][i],C[3][i]);
-		e2f[x].push_back(i);
-	}
-
-	long ans = 0;
-
-	for(int i=0; i<N; i++){
-		for(int j=i+1; j<N; j++){
-			for(int k=0; k<4; k++){
-				long f[4];
-				f[0] = encode(C[1][i],C[0][i],C[(k+0)%4][j],C[(k+3)%4][j]);
-				f[1] = encode(C[2][i],C[1][i],C[(k+3)%4][j],C[(k+2)%4][j]);
-				f[2] = encode(C[3][i],C[2][i],C[(k+2)%4][j],C[(k+1)%4][j]);
-				f[3] = encode(C[0][i],C[3][i],C[(k+1)%4][j],C[(k+0)%4][j]);
-				if(e2f.find(f[0]) == e2f.end() ||
-					e2f.find(f[1]) == e2f.end() ||
-					e2f.find(f[2]) == e2f.end() ||
-					e2f.find(f[3]) == e2f.end()) continue;
-				/*
-				cout << i << " " << j << endl;
-				cout << f[0] << endl;
-				cout << f[1] << endl;
-				cout << f[2] << endl;
-				cout << f[3] << endl;
-				*/
-				long c[4];
-				long a=0;
-				for(int m=0; m<4; m++){
-					c[m]=0;
-					for(auto l=e2f[f[m]].begin(); l!=e2f[f[m]].end(); l++){
-						//cout << " " << *l << endl;
-						if(*l<=i || *l==j) continue;
-						c[m]++;
-					}
-					//cout << c[m] << " ";
-				}
-				if(f[0]==f[1]&&f[1]==f[2]&&f[2]==f[3]){
-					if(c[0]>=4){
-						a = c[0]*(c[0]-1)*(c[0]-2)*(c[0]-3);
-					}
-				}
-				else if(f[0]==f[1]&&f[1]==f[2]){
-					if(c[0]>=3){
-						a = c[0]*(c[0]-1)*(c[0]-2)*c[3];
-					}
-				}
-				else if(f[0]==f[1]&&f[1]==f[3]){
-					if(c[0]>=3){
-						a = c[0]*(c[0]-1)*(c[0]-2)*c[2];
-					}
-				}
-				else if(f[0]==f[2]&&f[2]==f[3]){
-					if(c[0]>=3){
-						a = c[0]*(c[0]-1)*(c[0]-2)*c[1];
-					}
-				}
-				else if(f[1]==f[2]&&f[2]==f[3]){
-					if(c[1]>=3){
-						a = c[1]*(c[1]-1)*(c[1]-2)*c[0];
-					}
-				}
-				else if(f[0]==f[2]&&f[1]==f[3]){
-					if(c[0]>=2&&c[1]>=2){
-						a = c[0]*(c[0]-1)*c[1]*(c[1]-1);
-					}
-				}
-				else if(f[0]==f[1]&&f[2]==f[3]){
-					if(c[0]>=2&&c[2]>=2){
-						a = c[0]*(c[0]-1)*c[2]*(c[2]-1);
-					}
-				}
-				else if(f[0]==f[3]&&f[1]==f[2]){
-					if(c[0]>=2&&c[1]>=2){
-						a = c[0]*(c[0]-1)*c[1]*(c[1]-1);
-					}
-				}
-				else if(f[0]==f[2]){
-					if(c[0]>=2){
-						a = c[0]*(c[0]-1)*c[1]*c[3];
-					}
-				}
-				else if(f[1]==f[3]){
-					if(c[1]>=2){
-						a = c[1]*(c[1]-1)*c[0]*c[2];
-					}
-				}
-				else if(f[0]==f[1]){
-					if(c[0]>=2){
-						a = c[0]*(c[0]-1)*c[2]*c[3];
-					}
-				}
-				else if(f[1]==f[2]){
-					if(c[1]>=2){
-						a = c[1]*(c[1]-1)*c[0]*c[3];
-					}
-				}
-				else if(f[2]==f[3]){
-					if(c[2]>=2){
-						a = c[2]*(c[2]-1)*c[0]*c[1];
-					}
-				}
-				else if(f[0]==f[3]){
-					if(c[0]>=2){
-						a = c[0]*(c[0]-1)*c[1]*c[2];
-					}
-				}
-				else {
-					a = c[0]*c[1]*c[2]*c[3];
-				}
-				for(int m=0; m<4; m++) a*=rot(f[m]);
-				//cout << a << endl;
-				ans += a;
-			}
+	ll ans = 0;
+	for(int i=0; i<N; i++) for(int j=i+1; j<N; j++) for(int k=0; k<4; k++){
+		ll side[4];
+		for(int l=0; l<4; l++){
+			side[l] = canonical({C[i][l], C[j][(k+3-l+1)%4], C[j][(k+3-l)%4], C[i][(l+1)%4]});
 		}
+		sort(side, side+4);
+		ll x[4];
+		ll a = 1;
+		for(int l=0; l<4; l++){
+			x[l] = count_greater(faces[side[l]], i, j);
+			a *= mul(side[l]);
+		}
+		if(side[0]==side[1]&&side[1]==side[2]&&side[2]==side[3]){
+			a *= x[0]*(x[0]-1)*(x[0]-2)*(x[0]-3);
+		} else if(side[0]==side[1]&&side[1]==side[2]){
+			a *= x[0]*(x[0]-1)*(x[0]-2)*x[3];
+		} else if(side[1]==side[2]&&side[2]==side[3]){
+			a *= x[0]*x[1]*(x[1]-1)*(x[1]-2);
+		} else if(side[0]==side[1]&&side[2]==side[3]){
+			a *= x[0]*(x[0]-1)*x[2]*(x[2]-1);
+		} else if(side[0]==side[1]){
+			a *= x[0]*(x[0]-1)*x[2]*x[3];
+		} else if(side[1]==side[2]){
+			a *= x[0]*x[1]*(x[1]-1)*x[3];
+		} else if(side[2]==side[3]){
+			a *= x[0]*x[1]*x[2]*(x[2]-1);
+		} else {
+			a *= x[0]*x[1]*x[2]*x[3];
+		}
+		debug(any{i, j, k, a, x[0], x[1], x[2], x[3]});
+		ans += a;
 	}
 
 	cout << ans << endl;
