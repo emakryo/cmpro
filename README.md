@@ -22,6 +22,8 @@ Library for competitive programming
 	- Modular calculus utility class
 - `prime.cpp`
 	- Prime factorization
+- `rational.cpp`
+	- Rational number utility class
 - `scc.cpp`
 	- Strongly connected component
 - `segment_tree.cpp`
