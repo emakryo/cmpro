@@ -15,7 +15,7 @@ template<typename T> inline void pr(const vector<T> &xs){
 #define debugv(x)
 #endif
 
-template <typename T>
+template<typename T = long long>
 struct LCA {
 	int n, l, root;
 	vector<vector<pair<int, T>>> graph;
@@ -72,61 +72,125 @@ struct LCA {
 	}
 	T distance(int u, int v) const {
 		int c = (*this)(u, v);
+		if(c < 0) return -1; // when graph is not connected
 		return dist[u]+dist[v]-2*dist[c];
 	}
 };
 
-void dfs(int u, int p, int &k, vector<vector<int>> &graph, vector<int> &ord, vector<int> &low){
-	ord[u] = k++;
-	low[u] = ord[u];
-	for(int v: graph[u]){
-		if(v==p) continue;
-		if(ord[v]<0){
-			dfs(v, u, k, graph, ord, low);
-			low[u] = min(low[u], low[v]);
-		} else {
-			low[u] = min(low[u], ord[v]);
+struct LowLink {
+	int n;
+	vector<vector<int>> graph;
+	vector<int> used, ord, low;
+	vector<bool> articulation;
+	set<pair<int, int>> bridge;
+
+	LowLink(int n): n(n) {
+		graph.assign(n, {});
+	}
+	void add_edge(int u, int v){
+		graph[u].push_back(v);
+		graph[v].push_back(u);
+	}
+	int dfs(int u, int p, int k) {
+		used[u] = true;
+		ord[u] = k++;
+		low[u] = ord[u];
+		int cnt = 0;
+		for(int v : graph[u]) {
+			if(!used[v]) {
+				++cnt;
+				k = dfs(v, u, k);
+				low[u] = min(low[u], low[v]);
+				articulation[u] = articulation[u] ||(~p && low[v] >= ord[u]);
+				if(ord[u] < low[v]) bridge.insert(minmax(u, v));
+			} else if(v != p) {
+				low[u] = min(low[u], ord[v]);
+			}
+		}
+		articulation[u] = articulation[u] || (p == -1 && cnt > 1);
+		return k;
+	}
+	void build() {
+		used.assign(n, 0);
+		ord.assign(n, 0);
+		low.assign(n, 0);
+		articulation.assign(n, false);
+		int k = 0;
+		for(int i = 0; i < n; i++) {
+			if(!used[i]) k = dfs(i, -1, k);
 		}
 	}
-}
+};
+
+struct UnionFind{
+	std::vector<int> par, rnk, cnt;
+	UnionFind(int n){
+		par.assign(n, 0);
+		rnk.assign(n, 0);
+		cnt.assign(n, 1);
+		for(int i=0; i<n; i++) par[i]=i;
+	}
+	int root(int i){
+		if(par[i]==i) return i;
+		return par[i]=root(par[i]);
+	}
+	void unite(int i, int j){
+		int ri = root(i);
+		int rj = root(j);
+		if(ri==rj) return;
+
+		if(rnk[ri]==rnk[rj]){
+			cnt[rj] += cnt[ri];
+			par[ri] = rj;
+			rnk[rj]++;
+		}
+		else if(rnk[ri] < rnk[rj]){
+			cnt[rj] += cnt[ri];
+			par[ri] = rj;
+		}
+		else{
+			cnt[ri] += cnt[rj];
+			par[rj] = ri;
+		}
+	}
+	bool same(int i, int j){
+		return root(i) == root(j);
+	}
+	int count(int i){
+		return cnt[root(i)];
+	}
+};
 
 int main(){
 	int N, M;
 	cin >> N >> M;
-	vector<vector<int>> graph(N);
 	vector<int> X(M), Y(M);
 	for(int i=0; i<M; i++){
 		int x, y;
 		cin >> x >> y;
 		x--; y--;
-		graph[x].push_back(y);
-		graph[y].push_back(x);
+		if(x>y) swap(x, y);
 		X[i] = x;
 		Y[i] = y;
 	}
 
-	vector<int> low(N);
-	vector<int> ord(N, -1);
-	int k=0;
-	dfs(0, -1, k, graph, ord, low);
-	debugv(ord);
-	debugv(low);
-	vector<pair<int, int>> reduced_edges;
-	for(int i=0; i<M; i++){
-		reduced_edges.push_back({low[X[i]], low[Y[i]]});
-	}
-	sort(reduced_edges.begin(), reduced_edges.end());
-	auto it = unique(reduced_edges.begin(), reduced_edges.end());
-	reduced_edges.erase(it, reduced_edges.end());
+	LowLink lowlink(N);
+	for(int i=0; i<M; i++) lowlink.add_edge(X[i], Y[i]);
+	lowlink.build();
 
-	LCA<int> lca(N);
-	for(auto e: reduced_edges){
-		if(e.first != e.second){
-			debug(e.first, e.second);
-			lca.add_edge(e.first, e.second, 1);
+	UnionFind uf(N);
+	for(int i=0; i<M; i++){
+		if(lowlink.bridge.count({X[i], Y[i]})==0) uf.unite(X[i], Y[i]);
+	}
+
+	LCA<> lca(N);
+	for(int i=0; i<M; i++){
+		if(!uf.same(X[i], Y[i])){
+			debug(uf.root(X[i]), uf.root(Y[i]));
+			lca.add_edge(uf.root(X[i]), uf.root(Y[i]), 1);
 		}
 	}
-	lca.init();
+	lca.init(uf.root(0));
 
 	int Q;
 	cin >> Q;
@@ -134,9 +198,15 @@ int main(){
 		int a, b, c;
 		cin >> a >> b >> c;
 		a--; b--; c--;
-		debug(low[a], low[b], low[c]);
-		debug(lca.distance(low[a], low[b]),lca.distance(low[b], low[c]),lca.distance(low[a], low[c]));
-		if(lca.distance(low[a], low[b])+lca.distance(low[b], low[c])==lca.distance(low[a], low[c])){
+		a = uf.root(a);
+		b = uf.root(b);
+		c = uf.root(c);
+		debug(a, b, c);
+		ll x = lca.distance(a, b);
+		ll y = lca.distance(b, c);
+		ll z = lca.distance(a, c);
+		debug(x, y, z);
+		if(x + y == z){
 			cout << "OK" << endl;
 		} else {
 			cout << "NG" << endl;

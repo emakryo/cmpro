@@ -16,6 +16,10 @@ Library for competitive programming
 	- Lazy segment tree
 - `lca.cpp`
 	- Lowest common ancestor
+- `lowlink.cpp`
+	- Lowlink algorithm
+		- bridge listing
+		- articulation listing
 - `max_flow.cpp`
 	- Maximum flow (Ford-Fulkerson)
 - `mod.cpp`

@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <typename T>
+template<typename T = long long>
 struct LCA {
 	int n, l, root;
 	vector<vector<pair<int, T>>> graph;
@@ -10,12 +10,11 @@ struct LCA {
 	vector<vector<int>> par;
 	LCA(int n) : n(n) {
 		l = 0;
-		while ((1 << l) < n)
-			l++;
+		while ((1 << l) < n) l++;
 		graph.assign(n, {});
 		dist.assign(n, 0);
 		dep.assign(n, 0);
-		par.assign(n, vector<int>(l));
+		par.assign(n, vector<int>(l, -1));
 	}
 	void add_edge(int u, int v, T c = 0) {
 		graph[u].emplace_back(v, c);
@@ -59,6 +58,7 @@ struct LCA {
 	}
 	T distance(int u, int v) const {
 		int c = (*this)(u, v);
+		if(c < 0) return -1; // when graph is not connected
 		return dist[u]+dist[v]-2*dist[c];
 	}
 };
