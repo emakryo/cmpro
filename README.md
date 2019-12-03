@@ -1,6 +1,6 @@
 Library for competitive programming
 
-## Library
+## Library (`cpp/`, `rs/`)
 
 - `bit.cpp`
 	- Binary indexed tree
@@ -32,7 +32,7 @@ Library for competitive programming
 	- Strongly connected component
 - `segment_tree.cpp`
 	- Segment tree
-- `union_find.cpp`
+- `union_find.cpp`, `union_find.rs`
 	- Union find tree
 - `z_algo.cpp`
 	- Z algorithm (substring matching)
@@ -41,9 +41,9 @@ Library for competitive programming
 
 ### Templates
 
-- `template.cpp`
+- `cpp/template.cpp`
 - `template.hs`
-- `template.rs`
+- `rs/template.rs`
 
 ### test
 

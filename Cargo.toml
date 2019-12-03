@@ -1,0 +1,9 @@
+[package]
+name = "cmpro"
+version = "0.1.0"
+authors = ["Ryosuke Kamesawa <ryosuke.kamesawa@dena.com>"]
+
+[dependencies]
+
+[lib]
+path = "rs/lib.rs"
