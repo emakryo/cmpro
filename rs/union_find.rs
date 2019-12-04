@@ -1,19 +1,8 @@
-pub struct UnionFind {
-    par: Vec<usize>,
-    rnk: Vec<usize>,
-    cnt: Vec<usize>,
-}
+pub struct UnionFind { par: Vec<usize>, rnk: Vec<usize>, cnt: Vec<usize> }
 
 impl UnionFind {
     pub fn new(n: usize) -> Self {
-        let par: Vec<usize> = (0..n).collect();
-        let rnk: Vec<usize> = vec![0; n];
-        let cnt: Vec<usize> = vec![1; n];
-        UnionFind {
-            par: par,
-            rnk: rnk,
-            cnt: cnt,
-        }
+        UnionFind { par: (0..n).collect(), rnk: vec![0; n], cnt: vec![1; n] }
     }
 
     pub fn root(&mut self, i: usize) -> usize {
@@ -40,18 +29,13 @@ impl UnionFind {
             self.par[rj] = ri;
         }
     }
-    pub fn same(&mut self, i: usize, j: usize) -> bool {
-        self.root(i) == self.root(j)
-    }
-    pub fn count(&mut self, i: usize) -> usize {
-        let r = self.root(i);
-        self.cnt[r]
-    }
+    pub fn same(&mut self, i: usize, j: usize) -> bool { self.root(i) == self.root(j) }
+    pub fn count(&mut self, i: usize) -> usize { let r = self.root(i); self.cnt[r] }
 }
 
 
 #[cfg(test)]
-mod union_find_tests {
+mod tests {
     use super::*;
 
     #[test]
