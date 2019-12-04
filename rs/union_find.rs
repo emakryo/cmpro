@@ -1,7 +1,7 @@
 pub struct UnionFind {
-    pub par: Vec<usize>,
-    pub rnk: Vec<usize>,
-    pub cnt: Vec<usize>,
+    par: Vec<usize>,
+    rnk: Vec<usize>,
+    cnt: Vec<usize>,
 }
 
 impl UnionFind {
