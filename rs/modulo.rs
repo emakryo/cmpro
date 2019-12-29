@@ -41,88 +41,22 @@ impl<M: Modulus + Copy, T: Into<Mod<M>>> MulAssign<T> for Mod<M> {
     fn mul_assign(&mut self, other: T) { *self = self.mul(other); } }
 pub type M = Mod<MPrime>;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    struct M19;
-    impl Modulus for M19 { fn n() -> u64 { 19 } }
-    type M1 = Mod<M19>;
-    #[test]
-    fn test_new() {
-        let _: M = Mod::new(7);
+pub struct Combination<M>(Vec<Mod<M>>);
+impl<M: Modulus + Copy> Combination<M> {
+    pub fn new(n: u64) -> Self {
+        let fact: Vec<Mod<M>> = (0..n).scan(1.into(), |s, x| {
+            *s = if x == 0 { 1.into() } else { *s * x }; Some(*s)
+        }).collect(); Combination(fact)
     }
-    #[test]
-    fn test_default() {
-        let _: M = Default::default();
+    pub fn fact(&self, n: u64) -> (Mod<M>, u64) {
+        let p = M::n();
+        if n < p { return ((self.0)[n as usize], 0); }
+        let k = n / p; let (a, e) = self.fact(k.into());
+        ((self.0)[(n % p) as usize] * a * ((p - 2) * k % 2 + 1), e + k)
     }
-    #[test]
-    fn test_from() {
-        let x: M = From::from(10);
-        assert_eq!(x, Mod::new(10));
-    }
-    #[test]
-    fn test_into() {
-        let x: M = 10.into();
-        assert_eq!(x, Mod::new(10));
-    }
-    #[test]
-    fn test_add() {
-        let x: M1 = Mod::new(7);
-        let y: M1 = Mod::new(18);
-        assert_eq!(x + y, Mod::new(6));
-        assert_eq!(x, Mod::new(7));
-    }
-    #[test]
-    fn test_add_u64() {
-        let x: M1 = Mod::new(7);
-        assert_eq!(x + 18, Mod::new(6));
-        assert_eq!(18 + x, Mod::new(6));
-        assert_eq!(x, Mod::new(7));
-    }
-    #[test]
-    fn test_add_eq() {
-        let mut x: M1 = Mod::new(7);
-        let y = Mod::new(18);
-        x += y;
-        assert_eq!(x, Mod::new(6));
-    }
-    #[test]
-    fn test_sub() {
-        let x: M1 = Mod::new(7);
-        let y = Mod::new(18);
-        assert_eq!(x - y, Mod::new(8));
-        assert_eq!(x, Mod::new(7));
-    }
-    #[test]
-    fn test_sub_eq() {
-        let mut x: M1 = Mod::new(7);
-        let y = Mod::new(18);
-        x -= y;
-        assert_eq!(x, Mod::new(8));
-    }
-    #[test]
-    fn test_mul() {
-        let x: M1 = Mod::new(7);
-        let y = Mod::new(18);
-        assert_eq!(x * y, Mod::new(12));
-    }
-    #[test]
-    fn test_mul_eq() {
-        let mut x: M1 = Mod::new(7);
-        let y = Mod::new(18);
-        x *= y;
-        assert_eq!(x, Mod::new(12));
-    }
-    #[test]
-    fn test_pow() {
-        let x: M1 = Mod::new(7);
-        assert_eq!(x.pow(10), Mod::new(7));
-    }
-    #[test]
-    fn test_inv() {
-        let x: M1 = Mod::new(7);
-        assert_eq!(x.inv(), Mod::new(11));
-        assert_eq!(x.inv() * x, Mod::new(1));
+    pub fn comb(&self, n: u64, m: u64) -> Mod<M> {
+        if n < m { panic!("{} < {}", n, m); }
+        let (an, en) = self.fact(n); let (am, em) = self.fact(m); let (al, el) = self.fact(n-m);
+        if en > em + el { 0.into() } else { an * (am * al).inv() }
     }
 }
