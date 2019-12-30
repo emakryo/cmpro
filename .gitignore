@@ -4,3 +4,6 @@ a.out
 sample.txt
 target
 Cargo.lock
+in_*.txt
+out_*.txt
+metadata.json
