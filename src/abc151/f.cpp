@@ -1,4 +1,19 @@
 #include<bits/stdc++.h>
+#include<boost/variant.hpp>
+using namespace std;
+typedef long long ll;
+typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> any;
+template<typename T> inline void pr(const vector<T> &xs){
+	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" ";
+	(xs.empty()?cout:(cout<<xs[xs.size()-1]))<<endl;
+}
+#ifdef DEBUG
+#define debug(...) pr(any{__VA_ARGS__})
+#define debugv(x) pr((x))
+#else
+#define debug(...)
+#define debugv(x)
+#endif
 
 template<typename T>
 struct Point {
@@ -90,4 +105,44 @@ std::vector<P> circles_intersections(P x1, double r1, P x2, double r2){
 			  (a * z.y - z.x * b) / c) + x1,
 		   P((a * z.x - z.y * b) / c,
 			 (a * z.y + z.x * b) / c) + x1};
+}
+
+int main() {
+	int N;
+	cin >> N;
+	vector<int> X(N), Y(N);
+	for(int i=0; i<N; i++) cin >> X[i] >> Y[i];
+
+	double lb = 0, ub = 100000;
+	for(int l=0; l<100; l++){
+		double med = (lb+ub)/2;
+		debug(med);
+		vector<P> cands;
+		for(int i=0; i<N; i++){
+			for(int j=i+1; j<N; j++){
+				for(P p: circles_intersections(P(X[i], Y[i]), med, P(X[j], Y[j]), med)){
+					cands.push_back(p);
+				}
+			}
+			cands.push_back(P(X[i], Y[i]));
+		}
+
+		bool ok = false;
+		for(P p: cands){
+			bool ok_ = true;
+			for(int i=0; i<N; i++){
+				if(sqrt(dist2(P(X[i], Y[i]), p)) > med+1e-8) ok_ = false;
+			}
+			ok = ok || ok_;
+		}
+
+		if(ok){
+			ub = med;
+		} else {
+			lb = med;
+		}
+	}
+
+	cout << setprecision(10) << ub << endl;
+	return 0;
 }
