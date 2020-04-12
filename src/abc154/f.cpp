@@ -1,5 +1,19 @@
 #include<bits/stdc++.h>
-
+#include<boost/variant.hpp>
+using namespace std;
+typedef long long ll;
+typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> any;
+template<typename T> inline void pr(const vector<T> &xs){
+	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" ";
+	(xs.empty()?cout:(cout<<xs[xs.size()-1]))<<endl;
+}
+#ifdef DEBUG
+#define debug(...) pr(any{__VA_ARGS__})
+#define debugv(x) pr((x))
+#else
+#define debug(...)
+#define debugv(x)
+#endif
 // Extended Euclid's greatest common divisor algorithm
 // Find (x, y, g)
 // where $a*x + b*y = g$ and g is the greatest common divisor of (a, b)
@@ -120,10 +134,30 @@ struct Comb {
 		else return a1*(a2*a3).inv();
 	}
 };
-int main(){
-	using namespace std;
-	Comb comb(200000, 7);
 
-	assert((comb(13, 3).x==6));
+int main(){
+	int R1, R2, C1, C2;
+	cin >> R1 >> C1 >> R2 >> C2;
+	Comb comb(2000005);
+
+	mint sum = comb(R1+C1, R1);
+	mint ans = sum;
+	for(int k=R1+C1+1; k<=R2+C2; k++){
+		mint next = 2 * sum;
+		if(k<=R2+C1){
+			next += comb(k-1, C1-1);
+		} else {
+			next -= comb(k-1, R2);
+		}
+		if(k<=R1+C2){
+			next += comb(k-1, R1-1);
+		} else {
+			next -= comb(k-1, C2);
+		}
+		sum = next;
+		ans += sum;
+	}
+
+	cout << ans << endl;
 	return 0;
 }
