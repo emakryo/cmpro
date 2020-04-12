@@ -16,6 +16,13 @@ template<typename T> inline void pr(const vector<T> &xs){
 #endif
 
 int main(){
+	int N;
+	cin >> N;
+	ll ans = 0;
+	for(int i=1; i<=N; i++){
+		if(i%3!=0 && i%5!=0) ans+=i;
+	}
+	cout << ans << endl;
 
 	return 0;
 }
