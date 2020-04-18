@@ -2,19 +2,46 @@
 #include<boost/variant.hpp>
 using namespace std;
 typedef long long ll;
-typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> any;
+typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> anys;
 template<typename T> inline void pr(const vector<T> &xs){
 	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" ";
 	(xs.empty()?cout:(cout<<xs[xs.size()-1]))<<endl;
 }
 #ifdef DEBUG
-#define debug(...) pr(any{__VA_ARGS__})
+#define debug(...) pr(anys{__VA_ARGS__})
 #define debugv(x) pr((x))
 #else
 #define debug(...)
 #define debugv(x)
 #endif
 
+template <class T>
+struct Bit{
+	std::vector<T> v;
+	int n;
+	Bit(int n_): n(n_){ v.assign(n_, 0); }
+	// i must be 0 <= i < n
+	T sum(int i){
+		T s=0;
+		while(i>0){ s += v[i]; i -= i & -i; }
+		return s;
+	}
+	// i must be 1 <= i < n
+	void add(int i, T x){
+		while(i < n){ v[i] += x; i += i & -i; }
+	}
+};
+
+// v: permutation of (1, ... , n)
+int crossing(std::vector<int> &v){
+	Bit<int> bit(v.size()+1);
+	int count = 0;
+	for(int i=0; i<v.size(); i++){
+		count += i - bit.sum(v[i]);
+		bit.add(v[i], 1);
+	}
+	return count;
+}
 
 // Extended Euclid's greatest common divisor algorithm
 // Find (x, y, g)
@@ -80,22 +107,40 @@ int _main(){
 	return 0;
 }
 
+int __main(){
+	using namespace std;
+	Bit<int> bit(10);
+	bit.add(1,10);
+	bit.add(5,20);
+	assert(bit.sum(0)==0);
+	assert(bit.sum(2)==10);
+	assert(bit.sum(5)==30);
+	assert(bit.sum(8)==30);
+
+	vector<int> v = {3, 5, 1, 2, 4};
+	assert(crossing(v)==5);
+	return 0;
+}
+
 int main(){
 	int N;
-	cin >> N;
-	vector<ll> C(N);
-	for(int i=0; i<N; i++) cin >> C[i];
-	sort(C.begin(), C.end());
+	ll K;
+	cin >> N >> K;
+	vector<int> A(N);
+	for(int i=0; i<N; i++) cin >> A[i];
 
-	vector<mint> pow2(N+2);
-	pow2[0] = 1;
-	for(int i=0; i<=N; i++) pow2[i+1] = pow2[i]*2;
+	Bit<int> bit(2005);
 	mint ans(0);
 	for(int i=0; i<N; i++){
-		mint d = pow2[N] * pow2[i] * (pow2[N-1-i] + (N-i-1) * pow2[max(0, N-i-2)]);
-		debug(i, d.x, pow2[N].x, pow2[i].x, pow2[N-1-i].x, ((N-i-1) * pow2[max(0, N-i-2)]).x);
-		ans += C[i] * d;
+		ans += i - bit.sum(A[i]);
+		bit.add(A[i], 1);
 	}
+	ans *= K;
+
+	for(int i=0; i<N; i++){
+		ans += mint(K*(K-1)/2) * (N-bit.sum(A[i]));
+	}
+
 	cout << ans << endl;
 
 	return 0;

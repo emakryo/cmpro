@@ -2,19 +2,18 @@
 #include<boost/variant.hpp>
 using namespace std;
 typedef long long ll;
-typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> any;
+typedef vector<boost::variant<bool, ll, int, string, double, char*, const char*>> anys;
 template<typename T> inline void pr(const vector<T> &xs){
 	for(int i=0; i<xs.size()-1; i++) cout<<xs[i]<<" ";
 	(xs.empty()?cout:(cout<<xs[xs.size()-1]))<<endl;
 }
 #ifdef DEBUG
-#define debug(...) pr(any{__VA_ARGS__})
+#define debug(...) pr(anys{__VA_ARGS__})
 #define debugv(x) pr((x))
 #else
 #define debug(...)
 #define debugv(x)
 #endif
-
 
 // Extended Euclid's greatest common divisor algorithm
 // Find (x, y, g)
@@ -81,22 +80,16 @@ int _main(){
 }
 
 int main(){
-	int N;
-	cin >> N;
-	vector<ll> C(N);
-	for(int i=0; i<N; i++) cin >> C[i];
-	sort(C.begin(), C.end());
+	int N, K;
+	cin >> N >> K;
 
-	vector<mint> pow2(N+2);
-	pow2[0] = 1;
-	for(int i=0; i<=N; i++) pow2[i+1] = pow2[i]*2;
 	mint ans(0);
-	for(int i=0; i<N; i++){
-		mint d = pow2[N] * pow2[i] * (pow2[N-1-i] + (N-i-1) * pow2[max(0, N-i-2)]);
-		debug(i, d.x, pow2[N].x, pow2[i].x, pow2[N-1-i].x, ((N-i-1) * pow2[max(0, N-i-2)]).x);
-		ans += C[i] * d;
+	for(ll k=K; k<=N+1; k++){
+		debug(k, k*(2*N-k+1)/2,  k*(k-1)/2);
+		ans += k*(2*N-k+1)/2 - k*(k-1)/2 + 1;
 	}
 	cout << ans << endl;
+
 
 	return 0;
 }
