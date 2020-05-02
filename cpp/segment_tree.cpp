@@ -5,12 +5,13 @@ struct SegmentTree{
 	std::vector<T> v;
 	T def;
 	int n;
-	template<class I>
-	SegmentTree(I first, I last, T default_value){
+	SegmentTree(int n_, T default_value): def(default_value){
 		n = 1;
-		def = default_value;
-		while(n < last-first) n <<= 1;
-		v.assign(2*n-1, default_value);
+		while(n<n_) n <<= 1;
+		v.assign(2*n-1, def);
+	}
+	template<class I>
+	SegmentTree(I first, I last, T default_value): SegmentTree(last-first, default_value){
 		copy(first, last, v.begin()+n-1);
 		for(int i=n-2; i>=0; i--)
 			v[i] = merge(v[2*i+1], v[2*i+2]);
