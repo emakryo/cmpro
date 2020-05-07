@@ -21,7 +21,30 @@ void debug_(T&& x, Args&&... xs){
 #define dbg(...) 
 #endif
 
+void solve(){
+	ll n; cin >> n;
+	int ans = 0;
+	while(n>=2){
+		ll lb=1, ub=1e8;
+		while(ub-lb>1){
+			ll x = (ub+lb)/2;
+			if(x*(3*x+1)/2<=n){
+				lb = x;
+			} else {
+				ub = x;
+			}
+		}
+		dbg(lb, lb*(3*lb+1)/2);
+		n -= lb*(3*lb+1)/2;
+		ans++;
+	}
+	cout << ans << endl;
+}
+
+
 int main() {
 	ios_base::sync_with_stdio(false);
+	int t; cin >> t;
+	for(int i=0; i<t; i++) solve();
 	return 0;
 }

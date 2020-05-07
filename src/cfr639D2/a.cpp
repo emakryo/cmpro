@@ -21,7 +21,22 @@ void debug_(T&& x, Args&&... xs){
 #define dbg(...) 
 #endif
 
+void solve(){
+	int n, m; cin >> n >> m;
+	if(n==2&&m==2||n==1||m==1){
+		cout << "YES" << endl;
+	} else {
+		cout << "NO" << endl;
+	}
+}
+
 int main() {
 	ios_base::sync_with_stdio(false);
+	int t; cin >> t;
+	for(int i=0; i<t; i++){
+		solve();
+	}
+
+
 	return 0;
 }

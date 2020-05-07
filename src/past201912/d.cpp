@@ -23,5 +23,27 @@ void debug_(T&& x, Args&&... xs){
 
 int main() {
 	ios_base::sync_with_stdio(false);
+	int n;
+	cin >> n;
+	vector<bool> b(n+1);
+	int dup = -1;
+	for(int i=0; i<n; i++){
+		int a;
+		cin >> a;
+		if(b[a]) dup = a;
+		b[a] = true;
+	}
+	if(dup<0){
+		cout << "Correct" << endl;
+		return 0;
+	}
+
+	int lack;
+	for(int i=1; i<=n; i++){
+		if(!b[i]) lack=i;
+	}
+
+	cout << dup << " " << lack << endl;
+
 	return 0;
 }

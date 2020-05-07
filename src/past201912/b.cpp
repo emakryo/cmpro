@@ -23,5 +23,21 @@ void debug_(T&& x, Args&&... xs){
 
 int main() {
 	ios_base::sync_with_stdio(false);
+	int n;
+	cin >> n;
+	int a;
+	cin >> a;
+	for(int i=0; i<n-1; i++){
+		int b;
+		cin >> b;
+		if(a==b){
+			cout << "stay" << endl;
+		} else if(a<b){
+			cout << "up " << b-a << endl;
+		} else {
+			cout << "down " << a-b << endl;
+		}
+		a = b;
+	}
 	return 0;
 }

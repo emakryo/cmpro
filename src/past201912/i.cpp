@@ -23,5 +23,29 @@ void debug_(T&& x, Args&&... xs){
 
 int main() {
 	ios_base::sync_with_stdio(false);
+	int n, m; cin >> n >> m;
+	vector<pair<ll, ll>> sc(m);
+	for(int i=0; i<m; i++){
+		string x;
+		cin >> x >> sc[i].second;
+		for(int j=0; j<n; j++){
+			if(x[j]=='Y') sc[i].first+=1<<j;
+		}
+	}
+
+	vector<ll> dp(1<<n, 1e18);
+	dp[0] = 0;
+	sort(sc.begin(), sc.end());
+	for(int i=0; i<m; i++){
+		vector<ll> next(dp);
+		for(int j=0; j<(1<<n); j++){
+			int k = j|sc[i].first;
+			next[k] = min(next[k], dp[j]+sc[i].second);
+		}
+		dp = next;
+	}
+
+	ll ans = dp[(1<<n)-1];
+	cout << (ans==1e18?-1:ans) << endl;
 	return 0;
 }

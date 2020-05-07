@@ -23,5 +23,19 @@ void debug_(T&& x, Args&&... xs){
 
 int main() {
 	ios_base::sync_with_stdio(false);
+	string s;
+	cin >> s;
+	int ans = 0;
+	int d=100;
+	for(int i=0; i<3; i++){
+		if('0'<=s[i]&&s[i]<='9') ans += (s[i]-'0')*d;
+		else {
+			cout << "error" << endl;
+			return 0;
+		}
+		d /= 10;
+	}
+	cout << 2*ans << endl;
+
 	return 0;
 }

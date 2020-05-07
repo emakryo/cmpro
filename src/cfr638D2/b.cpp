@@ -21,7 +21,34 @@ void debug_(T&& x, Args&&... xs){
 #define dbg(...) 
 #endif
 
+void solve(){
+	int n, k;
+	cin >> n >> k;
+	vector<int> a(n);
+	for(int i=0; i<n; i++) cin >> a[i];
+
+	set<int> uniq;
+	for(int i=0; i<n; i++) uniq.insert(a[i]);
+
+	if(uniq.size()>k){
+		cout << -1 << endl;
+		return;
+	}
+
+	vector<int> ans;
+	for(int i=0; i<n; i++){
+		for(int x: uniq) ans.push_back(x);
+		for(int j=0; j<k-uniq.size(); j++) ans.push_back(1);
+	}
+
+	cout << ans.size() << endl;
+	cout << ans << endl;
+}
+
 int main() {
 	ios_base::sync_with_stdio(false);
+	int t;
+	cin >> t;
+	for(int i=0; i<t; i++) solve();
 	return 0;
 }

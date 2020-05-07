@@ -21,7 +21,25 @@ void debug_(T&& x, Args&&... xs){
 #define dbg(...) 
 #endif
 
+void solve(){
+	int n;
+	cin >> n;
+	ll sum = 0, a=1ll<<n;
+	for(int i=0; i<n; i++){
+		sum += 2ll<<i;
+		if(i<n/2-1) a+=2ll<<i;
+	}
+	dbg(sum, a);
+	cout << abs(sum-2*a) << endl;
+}
+
+
 int main() {
 	ios_base::sync_with_stdio(false);
+	int t;
+	cin >> t;
+	for(int i=0; i<t; i++){
+		solve();
+	}
 	return 0;
 }

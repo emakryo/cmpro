@@ -2,14 +2,6 @@
 using namespace std;
 typedef long long ll;
 
-template<typename T>
-ostream& operator<<(ostream &os, vector<T> &v){
-	string sep = " ";
-	if(v.size()) os << v[0];
-	for(int i=1; i<v.size(); i++) os << sep << v[i];
-	return os;
-}
-
 #ifdef DBG
 void debug_(){ cout << endl; }
 template<typename T, typename... Args>
@@ -23,5 +15,16 @@ void debug_(T&& x, Args&&... xs){
 
 int main() {
 	ios_base::sync_with_stdio(false);
+	ll X;
+	cin >> X;
+	for(ll a=-1000; a<=1000; a++){
+		for(ll b=-1000; b<=1000; b++){
+			if(a*a*a*a*a-b*b*b*b*b==X){
+				cout << a << " " << b << endl;
+				return 0;
+			}
+		}
+	}
+
 	return 0;
 }
