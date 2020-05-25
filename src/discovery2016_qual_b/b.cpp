@@ -1,6 +1,27 @@
 #include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 
-template <typename T>
+template<typename T>
+ostream& operator<<(ostream &os, vector<T> &v){
+	string sep = " ";
+	if(v.size()) os << v[0];
+	for(int i=1; i<v.size(); i++) os << sep << v[i];
+	return os;
+}
+
+#ifdef DBG
+void debug_(){ cout << endl; }
+template<typename T, typename... Args>
+void debug_(T&& x, Args&&... xs){
+	cout << x << " "; debug_(forward<Args>(xs)...);
+}
+#define dbg(...) debug_(__VA_ARGS__);
+#else
+#define dbg(...) 
+#endif
+
+template <class T>
 struct SegmentTree{
 	std::vector<T> v;
 	T def;
@@ -52,6 +73,44 @@ int _main(){
 	for(int i=0; i<10; i++){
 		assert((st.query(i, i+1)==i<a.size()?a[i]:1<<20));
 	}
+
+	return 0;
+}
+int main() {
+	ios_base::sync_with_stdio(false);
+
+	int n; cin >> n;
+	vector<int> a(n);
+	for(int i=0; i<n; i++){
+		cin >> a[i];
+	}
+
+	SegmentTree<pair<int, int>> st(n, {1e9, 0});
+	for(int i=0; i<n; i++){
+		st.update(i, {a[i], i});
+	}
+
+	int ans = 0;
+	int cur = -1;
+	for(int i=0; i<n; i++){
+		auto p = st.query(cur+1, n);
+		auto q = st.query(0, n);
+		int next;
+		if(p.first==q.first){
+			next = p.second;
+		} else {
+			next = q.second;
+		}
+		st.update(next, {1e9, 0});
+		if(cur<1&&1<=next||next<cur&&next>0){
+			ans++;
+		}
+		dbg(cur, next, ans);
+		cur = next;
+	}
+
+	cout << ans << endl;
+
 
 	return 0;
 }

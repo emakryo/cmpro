@@ -1,4 +1,25 @@
 #include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+template<typename T>
+ostream& operator<<(ostream &os, vector<T> &v){
+	string sep = " ";
+	if(v.size()) os << v[0];
+	for(int i=1; i<v.size(); i++) os << sep << v[i];
+	return os;
+}
+
+#ifdef DBG
+void debug_(){ cout << endl; }
+template<typename T, typename... Args>
+void debug_(T&& x, Args&&... xs){
+	cout << x << " "; debug_(forward<Args>(xs)...);
+}
+#define dbg(...) debug_(__VA_ARGS__);
+#else
+#define dbg(...) 
+#endif
 
 template <typename T>
 struct SegmentTree{
@@ -41,7 +62,7 @@ struct SegmentTree{
 
 template <typename T>
 T SegmentTree<T>::merge(T a, T b){
-	return std::min(a, b);
+	return std::max(a, b);
 }
 
 int _main(){
@@ -51,6 +72,45 @@ int _main(){
 	assert((st.query(0, 4)==1));
 	for(int i=0; i<10; i++){
 		assert((st.query(i, i+1)==i<a.size()?a[i]:1<<20));
+	}
+
+	return 0;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	int n; cin >> n;
+	vector<int> h(n);
+	for(int i=0; i<n; i++) cin >> h[i];
+
+	map<int, int> idx;
+	SegmentTree<int> st(h, 0);
+
+	vector<int> ans(n);
+	cout << 0 << endl;
+	for(int i=0; i<n-1; i++){
+		if(i==0||st.query(0, i)<h[i]){
+			cout << 1 << endl;
+			ans[i] = 1;
+			continue;
+		}
+		if(h[i-1]>h[i]){
+			ans[i] = ans[i-1]+1;
+			cout << ans[i] << endl;
+			continue;
+		}
+		int lb = 0, ub = i-1;
+		while(ub-lb>1){
+			int m = (lb+ub)/2;
+			if(st.query(m, i)<h[i]){
+				ub = m;
+			} else {
+				lb = m;
+			}
+		}
+		ans[i] = ans[lb]+1;
+		dbg(i, h[i], h[lb]);
+		cout << ans[i] << endl;
 	}
 
 	return 0;
