@@ -1,4 +1,25 @@
 #include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+template<typename T>
+ostream& operator<<(ostream &os, vector<T> &v){
+	string sep = " ";
+	if(v.size()) os << v[0];
+	for(int i=1; i<v.size(); i++) os << sep << v[i];
+	return os;
+}
+
+#ifdef DBG
+void debug_(){ cout << endl; }
+template<typename T, typename... Args>
+void debug_(T&& x, Args&&... xs){
+	cout << x << " "; debug_(forward<Args>(xs)...);
+}
+#define dbg(...) debug_(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
 
 // Extended Euclid's greatest common divisor algorithm
 // Find (x, y, g)
@@ -61,5 +82,36 @@ int _main(){
 	for(auto x: std::vector<int>{3, 5, 7, 11, 13, 17, 19}){
 		assert((mint(4, x)/mint(4, x))==1);
 	}
+	return 0;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cout << setprecision(20) << fixed;
+
+	int n; cin >> n;
+	vector<int> a(n);
+	for(int i=0; i<n; i++) cin >> a[i];
+
+	mint x = 1;
+	mint y = 1;
+	ll f = 0;
+	for(int i=0; i<n; i++){
+		f += a[i];
+		mint nx, ny;
+		if(f>=10){
+			nx = x * 10;
+			ny = y + x*(f%10);
+		} else {
+			ny = y + x*(f%10);
+			nx = ny;
+		}
+		x=nx;
+		y=ny;
+		f /= 10;
+		dbg(a[i], x, y, f);
+	}
+
+	cout << y+f*x-1 << endl;
 	return 0;
 }
