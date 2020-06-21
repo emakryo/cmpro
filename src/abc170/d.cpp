@@ -30,5 +30,25 @@ void debug_(T&& x, Args&&... xs){
 int main() {
 	ios_base::sync_with_stdio(false);
 	cout << setprecision(20) << fixed;
+	int n; cin >> n;
+	vector<int> a(n); cin >> a;
+	sort(a.begin(), a.end());
+
+	map<int, int> cnt;
+	for(int i=0; i<n; i++) cnt[a[i]]++;
+
+	vector<bool> dp(a.back()+1, true);
+	for(auto p: cnt){
+		for(int j=2; j*p.first<=a.back(); j++){
+			dp[j*p.first] = false;
+		}
+	}
+
+	int ans = 0;
+	for(int i=0; i<n; i++){
+		if(cnt[a[i]]==1&&dp[a[i]]) ans++;
+	}
+
+	cout << ans << endl;
 	return 0;
 }

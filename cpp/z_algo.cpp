@@ -56,7 +56,7 @@ std::vector<int> occurance(std::string &text, std::string &pattern){
 	return idx;
 }
 
-int main(){
+int _main(){
 	using namespace std;
 	string text = "aababaabaacaabaa";
 	string pat = "aab";

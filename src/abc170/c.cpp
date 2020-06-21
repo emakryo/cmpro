@@ -30,5 +30,24 @@ void debug_(T&& x, Args&&... xs){
 int main() {
 	ios_base::sync_with_stdio(false);
 	cout << setprecision(20) << fixed;
+
+	int x, n; cin >> x >> n;
+	vector<int> p(n); cin >> p;
+
+	set<int> ps;
+	for(int i=0; i<n; i++) ps.insert(p[i]);
+
+	int dmin = x;
+	int ans = 0;
+	for(int y=1; y<105; y++){
+		if(ps.count(y)) continue;
+		if(abs(x-y)<dmin){
+			dmin = abs(x-y);
+			ans = y;
+		}
+	}
+
+	cout << ans << endl;
+
 	return 0;
 }
