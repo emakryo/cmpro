@@ -28,7 +28,7 @@ int crossing(std::vector<int> &v){
 	return count;
 }
 
-int main(){
+int _main(){
 	using namespace std;
 	Bit<int> bit(10);
 	bit.add(1,10);
