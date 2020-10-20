@@ -56,10 +56,3 @@ struct mint {
 		return mint(y, m);
 	}
 };
-
-int _main(){
-	for(auto x: std::vector<int>{3, 5, 7, 11, 13, 17, 19}){
-		assert((mint(4, x)/mint(4, x))==1);
-	}
-	return 0;
-}

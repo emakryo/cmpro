@@ -1,28 +1,15 @@
 #include<bits/stdc++.h>
-#include<boost/variant.hpp>
-using namespace std;
-typedef long long ll;
-typedef vector<boost::variant<bool, ll, int, string, double>> any;
-template<typename T> void pr(const vector<T> &xs){
-	for(int i=0; i<xs.size()-1; i++) cout << xs[i] << " ";
-	cout << xs[xs.size()-1] << endl;
-}
-template<typename T> void debug(const vector<T> &xs){
-#ifdef DEBUG
-	pr(xs);
-#endif
-}
 
-template <typename T, class E>
+template <typename T, typename E>
 struct LazySegmentTree{
-	vector<T> data, lazy;
+	std::vector<T> data, lazy;
 	T def;
 	E lazy_def;
 	int n, height;
 	LazySegmentTree(int n_, T def, E lazy_def): def(def), lazy_def(lazy_def){
 		init(n_);
 	}
-	LazySegmentTree(const vector<T> &v, T def, E lazy_def): def(def), lazy_def(lazy_def){
+	LazySegmentTree(const std::vector<T> &v, T def, E lazy_def): def(def), lazy_def(lazy_def){
 		int n_ = v.size();
 		init(n_);
 		for(int i=0; i<n_; i++) data[n+i] = v[i];
@@ -78,23 +65,7 @@ struct LazySegmentTree{
 	}
 
 	// Example (min, add)
-	T merge(T left, T right) const { return min(left, right); }
+	T merge(T left, T right) const { return std::min(left, right); }
 	E propagate(E before, E change) const { return before+change; }
 	T apply(T val, E laz) const { return val+laz; }
 };
-
-int main(){
-	vector<int> a({4,2,2,1,5,9,10});
-	LazySegmentTree<int, int> st(a, 1<<20, 0);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-	st.set(3, 8);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-	st.update(2, 6, 8);
-	st.update(5, 7, -3);
-	cout << st.query(0, 4) << endl;
-	for(int i=0; i<8; i++) cout << st.query(i, i+1) << endl;
-
-	return 0;
-}

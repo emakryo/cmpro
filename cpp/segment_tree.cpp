@@ -18,6 +18,7 @@ struct SegmentTree{
 	}
 	SegmentTree(std::vector<T> initial_data, T default_value):
 	SegmentTree(initial_data.begin(), initial_data.end(), default_value){}
+	// 0 <= idx < n
 	void update(int idx, T val){
 		idx += n-1;
 		v[idx] = val;
@@ -31,6 +32,7 @@ struct SegmentTree{
 		if(b<=l||r<=a) return def;
 		return merge(q(a, b, 2*k+1, l, (l+r)/2), q(a, b, 2*k+2, (l+r)/2, r));
 	}
+	// 0 <= a < b < n
 	T query(int a, int b){
 		return q(a, b, 0, 0, n);
 	}
@@ -42,16 +44,4 @@ struct SegmentTree{
 template <typename T>
 T SegmentTree<T>::merge(T a, T b){
 	return std::min(a, b);
-}
-
-int _main(){
-	using namespace std;
-	vector<int> a = {4,2,2,1,5,9,10};
-	SegmentTree<int> st(a.begin(), a.end(), 1<<20);
-	assert((st.query(0, 4)==1));
-	for(int i=0; i<10; i++){
-		assert((st.query(i, i+1)==i<a.size()?a[i]:1<<20));
-	}
-
-	return 0;
 }

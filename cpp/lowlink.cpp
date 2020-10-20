@@ -1,12 +1,11 @@
 #include<bits/stdc++.h>
-using namespace std;
 
 struct LowLink {
 	int n;
-	vector<vector<int>> graph;
-	vector<int> used, ord, low;
-	vector<bool> articulation;
-	set<pair<int, int>> bridge;
+	std::vector<std::vector<int>> graph;
+	std::vector<int> used, ord, low;
+	std::vector<bool> articulation;
+	std::set<std::pair<int, int>> bridge;
 
 	LowLink(int n): n(n) {
 		graph.assign(n, {});
@@ -24,11 +23,11 @@ struct LowLink {
 			if(!used[v]) {
 				++cnt;
 				k = dfs(v, u, k);
-				low[u] = min(low[u], low[v]);
+				low[u] = std::min(low[u], low[v]);
 				articulation[u] = articulation[u] ||(~p && low[v] >= ord[u]);
-				if(ord[u] < low[v]) bridge.insert(minmax(u, v));
+				if(ord[u] < low[v]) bridge.insert(std::minmax(u, v));
 			} else if(v != p) {
-				low[u] = min(low[u], ord[v]);
+				low[u] = std::min(low[u], ord[v]);
 			}
 		}
 		articulation[u] = articulation[u] || (p == -1 && cnt > 1);

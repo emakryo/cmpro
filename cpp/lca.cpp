@@ -1,14 +1,13 @@
 #include <bits/stdc++.h>
-using namespace std;
 
 template<typename T = long long>
 struct LCA {
 	int n, l, root=-1;
-	vector<vector<pair<int, T>>> graph;
-	vector<int> dep;
-	vector<T> dist;
-	vector<vector<int>> par;
-	vector<vector<T>> max_edges;
+	std::vector<std::vector<std::pair<int, T>>> graph;
+	std::vector<int> dep;
+	std::vector<T> dist;
+	std::vector<std::vector<int>> par;
+	std::vector<std::vector<T>> max_edges;
 	LCA(int n) : n(n) {
 		l = 0;
 		while ((1 << l) < n) l++;

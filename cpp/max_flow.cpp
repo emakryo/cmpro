@@ -1,15 +1,8 @@
 #include<bits/stdc++.h>
-typedef long long ll;
 
-struct edge {
-	int to, rev; // destination, index for reversed edge
-	ll cap; // capacity
-};
-
-class FlowGraph{
+class MaxFlowGraph{
+	using ll = long long;
 	const ll INF = 1e18;
-	int n;
-	std::vector<std::vector<edge> > graph;
 	std::vector<bool> used;
 	ll dfs(int v, int t, ll f){
 		if(v == t) return f;
@@ -28,8 +21,14 @@ class FlowGraph{
 		return 0;
 	}
 
-	public:
-	FlowGraph(int n_vertex): n(n_vertex){
+public:
+	struct edge {
+		int to, rev; // destination, index for reversed edge
+		long long cap; // capacity
+	};
+	int n;
+	std::vector<std::vector<edge> > graph;
+	MaxFlowGraph(int n_vertex): n(n_vertex){
 		graph.assign(n_vertex, {});
 	}
 
@@ -38,7 +37,7 @@ class FlowGraph{
 		graph[to].push_back((edge){from, (int)graph[from].size()-1, 0});
 	}
 
-	ll max_flow(int s, int t){
+	ll flow(int s, int t){
 		ll flow = 0;
 		while(true){
 			used.assign(n, false);
@@ -47,5 +46,4 @@ class FlowGraph{
 			flow += f;
 		}
 	}
-
 };

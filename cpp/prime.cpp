@@ -37,7 +37,7 @@ std::map<long long, int> get_factors(long long x){
 
 struct Prime {
 	std::vector<bool> sieve;
-	std::vector<int> list;
+	std::vector<int> primes;
 
 	// Keep primes up to n_max
 	Prime(int n_max) {
@@ -50,13 +50,13 @@ struct Prime {
 			for(int j=2*i; j<sieve.size(); j+=i) sieve[j] = false;
 		}
 		for(int i=2; i<sieve.size(); i++){
-			if(sieve[i]) list.push_back(i);
+			if(sieve[i]) primes.push_back(i);
 		}
 	}
 
 	std::map<long long, int> factors(long long x) {
 		std::map<long long, int> fs;
-		for(int p: list){
+		for(int p: primes){
 			if(p*p>x) break;
 			while(x%p==0){
 				fs[p]++;
