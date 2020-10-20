@@ -7,4 +7,5 @@ Cargo.lock
 in_*.txt
 out_*.txt
 metadata.json
-snippets
+/.vscode/*
+!/.vscode/cpp.code-snippets
