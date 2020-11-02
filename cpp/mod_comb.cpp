@@ -13,67 +13,71 @@ long long ext_gcd(long long a, long long b, long long &x, long long &y){
 	return g;
 }
 
+template<long long m=1000000007>
 struct mint {
 	typedef long long ll;
-	ll x, m;
-	mint(ll x=0, ll m=1e9+7): x((m+x%m)%m), m(m) {}
-	mint operator-() const { return mint(m-x, m); }
-	mint& operator+=(const mint o) { x=(x+o.x)%m; return *this; }
-	mint& operator+=(const ll o) { return (*this)+=mint(o, m); }
-	mint& operator-=(const mint o) { return (*this)+=(-o); }
-	mint& operator-=(const ll o) { return (*this)-=mint(o, m); }
-	mint& operator*=(const mint o) { x = x*o.x%m; return *this; }
-	mint& operator*=(const ll o) { return (*this)*=mint(o, m); }
-	mint& operator/=(const mint o) { return (*this)*=o.inv(); }
-	mint& operator/=(const ll o) { return (*this)/=mint(o, m); }
-	friend mint operator+(mint l, const mint r) { l+=r; return l; }
-	friend mint operator+(mint l, const ll r) { l+=r; return l; }
-	friend mint operator+(const ll l, mint r) { r+=l; return r; }
-	friend mint operator-(mint l, const mint r) { l-=r; return l; }
-	friend mint operator-(mint l, const ll r) { l-=r; return l; }
-	friend mint operator-(const ll l, mint r) { r-=l; return r; }
-	friend mint operator*(mint l, const mint r) { l*=r; return l; }
-	friend mint operator*(mint l, const ll r) { l*=r; return l; }
-	friend mint operator*(const ll l, mint r) { r*=l; return r; }
-	friend mint operator/(mint l, const mint r) { l/=r; return l; }
-	friend mint operator/(mint l, const ll r) { l/=r; return l; }
-	friend mint operator/(const ll l, const mint r) { return mint(l, r.m)/r; }
-	bool operator==(const mint o) const { return x==o.x; }
-	bool operator!=(const mint o) const { return x!=o.x; }
-	friend bool operator==(const ll l, const mint r) { return mint(l, r.m) == r; }
-	friend bool operator!=(const ll l, const mint r) { return mint(l, r.m) != r; }
-	friend std::ostream& operator<<(std::ostream &os, const mint x) { return os << x.x; }
+	ll x;
+	static constexpr ll mod() { return m; }
+	constexpr mint(ll x=0): x((m+x%m)%m) {}
+	mint<m> operator-() const { return mint(m-x); }
+	mint<m>& operator+=(const mint<m> o) { x=(x+o.x)%m; return *this; }
+	mint<m>& operator+=(const ll o) { return (*this)+=mint(o); }
+	mint<m>& operator-=(const mint<m> o) { return (*this)+=(-o); }
+	mint<m>& operator-=(const ll o) { return (*this)-=mint(o); }
+	mint<m>& operator*=(const mint<m> o) { x = x*o.x%m; return *this; }
+	mint<m>& operator*=(const ll o) { return (*this)*=mint(o); }
+	mint<m>& operator/=(const mint<m> o) { return (*this)*=o.inv(); }
+	mint<m>& operator/=(const ll o) { return (*this)/=mint(o); }
+	friend mint<m> operator+(mint<m> l, const mint<m> r) { l+=r; return l; }
+	friend mint<m> operator+(mint<m> l, const ll r) { l+=r; return l; }
+	friend mint<m> operator+(const ll l, mint<m> r) { r+=l; return r; }
+	friend mint<m> operator-(mint<m> l, const mint<m> r) { l-=r; return l; }
+	friend mint<m> operator-(mint<m> l, const ll r) { l-=r; return l; }
+	friend mint<m> operator-(const ll l, mint<m> r) { r-=l; return r; }
+	friend mint<m> operator*(mint<m> l, const mint<m> r) { l*=r; return l; }
+	friend mint<m> operator*(mint<m> l, const ll r) { l*=r; return l; }
+	friend mint<m> operator*(const ll l, mint<m> r) { r*=l; return r; }
+	friend mint<m> operator/(mint<m> l, const mint<m> r) { l/=r; return l; }
+	friend mint<m> operator/(mint<m> l, const ll r) { l/=r; return l; }
+	friend mint<m> operator/(const ll l, const mint<m> r) { return mint(l)/r; }
+	bool operator==(const mint<m> o) const { return x==o.x; }
+	bool operator!=(const mint<m> o) const { return x!=o.x; }
+	friend bool operator==(const ll l, const mint<m> r) { return mint<m>(l) == r; }
+	friend bool operator!=(const ll l, const mint<m> r) { return mint<m>(l) != r; }
+	friend std::ostream& operator<<(std::ostream &os, const mint<m> x) { return os << x.x; }
 
-	mint pow(ll k) const {
-		if(k==0) return mint(1, m);
+	mint<m> pow(ll k) const {
+		if(k==0) return mint<m>(1);
 		if(k%2) return pow(k-1)*x;
-		mint z = pow(k/2); return z*z;
+		mint<m> z = pow(k/2); return z*z;
 	}
 
-	mint inv() const {
+	mint<m> inv() const {
 		ll y,z;
 		ext_gcd(x, m, y, z);
-		return mint(y, m);
+		return mint<m>(y);
 	}
 };
 
+template<long long m=1000000007>
 struct Comb {
 	typedef long long ll;
-	std::vector<mint> fact, fact_inv;
-	ll mod;
-	Comb(int n_max=2000005, ll m=1e9+7): mod(m) {
-		fact.emplace_back(1, m);
-		fact_inv.emplace_back(1, m);
-		for(int i=1; i<std::min((ll)n_max, mod); i++){
-			fact.push_back(fact[i-1] * i);
-			fact_inv.push_back(fact[i].inv());
+	std::vector<mint<m>> fact, fact_inv;
+	Comb(int n_max=2000005) {
+		fact.assign(n_max, 0);
+		fact_inv.assign(n_max, 0);
+		fact[0] = 1;
+		fact_inv[0] = 1;
+		for(int i=1; i<std::min((ll)n_max, m); i++){
+			fact[i] = fact[i-1] * i;
+			fact_inv[i] = fact[i].inv();
 		}
 	}
-	mint operator() (ll n, ll m) const {
-		if(n < mod){
-			return fact[n] * fact_inv[m] * fact_inv[n-m];
+	mint<m> operator() (ll n, ll k) const {
+		if(n < m){
+			return fact[n] * fact_inv[k] * fact_inv[n-k];
 		} else {
-			return comb_ext(n, m);
+			return comb_ext(n, k);
 		}
 	}
 
@@ -93,16 +97,16 @@ struct Comb {
 // From the facts:
 //   (p-1)! = p-1 (mod p) (c.f. Willson's theorem)
 //   (p-2)**2 = 1 (mod p)
-	mint fact_ext(ll n, ll &e) const {
+	mint<m> fact_ext(ll n, ll &e) const {
 		if(n == 0){
 			e = 0;
-			return mint(1, mod);
+			return mint<m>(1);
 		}
 
-		mint na = fact_ext(n/mod, e);
-		e += n/mod;
-		mint a = na * fact[n%mod];
-		if((n/mod)%2) a = a * (mod-1);
+		mint<m> na = fact_ext(n/m, e);
+		e += n/m;
+		mint<m> a = na * fact[n%m];
+		if((n/m)%2) a = a * (m-1);
 		return a;
 	}
 
@@ -110,11 +114,11 @@ struct Comb {
 // (n, m) = n!/(n-m)!m!
 //        = (a_n * p^(e_n)) / ((a_{n-m} * p^(e_{n-m}) * (a_m * p^e_m))
 //        = a_n / (a_{n-m} * a_m) * p^(e_n - e_{n-m} - e_m)
-	mint comb_ext (ll n, ll m) const {
+	mint<m> comb_ext (ll n, ll k) const {
 		ll e1,e2,e3;
-		mint a1 = fact_ext(n, e1);
-		mint a2 = fact_ext(m, e2);
-		mint a3 = fact_ext(n-m, e3);
+		mint<m> a1 = fact_ext(n, e1);
+		mint<m> a2 = fact_ext(k, e2);
+		mint<m> a3 = fact_ext(n-k, e3);
 
 		if(e1 > e2+e3) return 0;
 		else return a1*(a2*a3).inv();
