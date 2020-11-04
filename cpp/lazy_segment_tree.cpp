@@ -2,7 +2,8 @@
 
 template <typename T, typename E>
 struct LazySegmentTree{
-	std::vector<T> data, lazy;
+	std::vector<T> data;
+	std::vector<E> lazy;
 	T def;
 	E lazy_def;
 	int n, height;
