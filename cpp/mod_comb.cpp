@@ -14,55 +14,55 @@ long long ext_gcd(long long a, long long b, long long &x, long long &y){
 }
 
 template<long long m=1000000007>
-struct mint {
+struct modint {
 	typedef long long ll;
 	ll x;
 	static constexpr ll mod() { return m; }
-	constexpr mint(ll x=0): x((m+x%m)%m) {}
-	mint<m> operator-() const { return mint(m-x); }
-	mint<m>& operator+=(const mint<m> o) { x=(x+o.x)%m; return *this; }
-	mint<m>& operator+=(const ll o) { return (*this)+=mint(o); }
-	mint<m>& operator-=(const mint<m> o) { return (*this)+=(-o); }
-	mint<m>& operator-=(const ll o) { return (*this)-=mint(o); }
-	mint<m>& operator*=(const mint<m> o) { x = x*o.x%m; return *this; }
-	mint<m>& operator*=(const ll o) { return (*this)*=mint(o); }
-	mint<m>& operator/=(const mint<m> o) { return (*this)*=o.inv(); }
-	mint<m>& operator/=(const ll o) { return (*this)/=mint(o); }
-	friend mint<m> operator+(mint<m> l, const mint<m> r) { l+=r; return l; }
-	friend mint<m> operator+(mint<m> l, const ll r) { l+=r; return l; }
-	friend mint<m> operator+(const ll l, mint<m> r) { r+=l; return r; }
-	friend mint<m> operator-(mint<m> l, const mint<m> r) { l-=r; return l; }
-	friend mint<m> operator-(mint<m> l, const ll r) { l-=r; return l; }
-	friend mint<m> operator-(const ll l, mint<m> r) { r-=l; return r; }
-	friend mint<m> operator*(mint<m> l, const mint<m> r) { l*=r; return l; }
-	friend mint<m> operator*(mint<m> l, const ll r) { l*=r; return l; }
-	friend mint<m> operator*(const ll l, mint<m> r) { r*=l; return r; }
-	friend mint<m> operator/(mint<m> l, const mint<m> r) { l/=r; return l; }
-	friend mint<m> operator/(mint<m> l, const ll r) { l/=r; return l; }
-	friend mint<m> operator/(const ll l, const mint<m> r) { return mint(l)/r; }
-	bool operator==(const mint<m> o) const { return x==o.x; }
-	bool operator!=(const mint<m> o) const { return x!=o.x; }
-	friend bool operator==(const ll l, const mint<m> r) { return mint<m>(l) == r; }
-	friend bool operator!=(const ll l, const mint<m> r) { return mint<m>(l) != r; }
-	friend std::ostream& operator<<(std::ostream &os, const mint<m> x) { return os << x.x; }
+	constexpr modint(ll x=0): x((m+x%m)%m) {}
+	modint<m> operator-() const { return modint(m-x); }
+	modint<m>& operator+=(const modint<m> o) { x=(x+o.x)%m; return *this; }
+	modint<m>& operator+=(const ll o) { return (*this)+=modint(o); }
+	modint<m>& operator-=(const modint<m> o) { return (*this)+=(-o); }
+	modint<m>& operator-=(const ll o) { return (*this)-=modint(o); }
+	modint<m>& operator*=(const modint<m> o) { x = x*o.x%m; return *this; }
+	modint<m>& operator*=(const ll o) { return (*this)*=modint(o); }
+	modint<m>& operator/=(const modint<m> o) { return (*this)*=o.inv(); }
+	modint<m>& operator/=(const ll o) { return (*this)/=modint(o); }
+	friend modint<m> operator+(modint<m> l, const modint<m> r) { l+=r; return l; }
+	friend modint<m> operator+(modint<m> l, const ll r) { l+=r; return l; }
+	friend modint<m> operator+(const ll l, modint<m> r) { r+=l; return r; }
+	friend modint<m> operator-(modint<m> l, const modint<m> r) { l-=r; return l; }
+	friend modint<m> operator-(modint<m> l, const ll r) { l-=r; return l; }
+	friend modint<m> operator-(const ll l, modint<m> r) { r-=l; return r; }
+	friend modint<m> operator*(modint<m> l, const modint<m> r) { l*=r; return l; }
+	friend modint<m> operator*(modint<m> l, const ll r) { l*=r; return l; }
+	friend modint<m> operator*(const ll l, modint<m> r) { r*=l; return r; }
+	friend modint<m> operator/(modint<m> l, const modint<m> r) { l/=r; return l; }
+	friend modint<m> operator/(modint<m> l, const ll r) { l/=r; return l; }
+	friend modint<m> operator/(const ll l, const modint<m> r) { return modint(l)/r; }
+	bool operator==(const modint<m> o) const { return x==o.x; }
+	bool operator!=(const modint<m> o) const { return x!=o.x; }
+	friend bool operator==(const ll l, const modint<m> r) { return modint<m>(l) == r; }
+	friend bool operator!=(const ll l, const modint<m> r) { return modint<m>(l) != r; }
+	friend std::ostream& operator<<(std::ostream &os, const modint<m> x) { return os << x.x; }
 
-	mint<m> pow(ll k) const {
-		if(k==0) return mint<m>(1);
+	modint<m> pow(ll k) const {
+		if(k==0) return modint<m>(1);
 		if(k%2) return pow(k-1)*x;
-		mint<m> z = pow(k/2); return z*z;
+		modint<m> z = pow(k/2); return z*z;
 	}
 
-	mint<m> inv() const {
+	modint<m> inv() const {
 		ll y,z;
 		ext_gcd(x, m, y, z);
-		return mint<m>(y);
+		return modint<m>(y);
 	}
 };
 
 template<long long m=1000000007>
 struct Comb {
 	typedef long long ll;
-	std::vector<mint<m>> fact, fact_inv;
+	std::vector<modint<m>> fact, fact_inv;
 	Comb(int n_max=2000005) {
 		fact.assign(n_max, 0);
 		fact_inv.assign(n_max, 0);
@@ -73,7 +73,7 @@ struct Comb {
 			fact_inv[i] = fact[i].inv();
 		}
 	}
-	mint<m> operator() (ll n, ll k) const {
+	modint<m> operator() (ll n, ll k) const {
 		if(n < m){
 			return fact[n] * fact_inv[k] * fact_inv[n-k];
 		} else {
@@ -97,15 +97,15 @@ struct Comb {
 // From the facts:
 //   (p-1)! = p-1 (mod p) (c.f. Willson's theorem)
 //   (p-2)**2 = 1 (mod p)
-	mint<m> fact_ext(ll n, ll &e) const {
+	modint<m> fact_ext(ll n, ll &e) const {
 		if(n == 0){
 			e = 0;
-			return mint<m>(1);
+			return modint<m>(1);
 		}
 
-		mint<m> na = fact_ext(n/m, e);
+		modint<m> na = fact_ext(n/m, e);
 		e += n/m;
-		mint<m> a = na * fact[n%m];
+		modint<m> a = na * fact[n%m];
 		if((n/m)%2) a = a * (m-1);
 		return a;
 	}
@@ -114,13 +114,15 @@ struct Comb {
 // (n, m) = n!/(n-m)!m!
 //        = (a_n * p^(e_n)) / ((a_{n-m} * p^(e_{n-m}) * (a_m * p^e_m))
 //        = a_n / (a_{n-m} * a_m) * p^(e_n - e_{n-m} - e_m)
-	mint<m> comb_ext (ll n, ll k) const {
+	modint<m> comb_ext (ll n, ll k) const {
 		ll e1,e2,e3;
-		mint<m> a1 = fact_ext(n, e1);
-		mint<m> a2 = fact_ext(k, e2);
-		mint<m> a3 = fact_ext(n-k, e3);
+		modint<m> a1 = fact_ext(n, e1);
+		modint<m> a2 = fact_ext(k, e2);
+		modint<m> a3 = fact_ext(n-k, e3);
 
 		if(e1 > e2+e3) return 0;
 		else return a1*(a2*a3).inv();
 	}
 };
+
+using mint = modint<>;
