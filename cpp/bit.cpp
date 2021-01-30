@@ -18,9 +18,9 @@ struct Bit{
 };
 
 // v: permutation of (1, ... , n)
-int crossing(std::vector<int> &v){
-	Bit<int> bit(v.size()+1);
-	int count = 0;
+long long crossing(std::vector<int> &v){
+	Bit<long long> bit(v.size()+1);
+	long long count = 0;
 	for(int i=0; i<v.size(); i++){
 		count += i - bit.sum(v[i]);
 		bit.add(v[i], 1);
