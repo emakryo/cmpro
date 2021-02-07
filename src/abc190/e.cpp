@@ -73,30 +73,22 @@ int main() {
         }
     }
 
-    vector<vector<vector<int>>> dp(1<<k, vector<vector<int>>(k, vector<int>(k, 1e9)));
+    vector<vector<int>> dp(1<<k, vector<int>(k, 1e9));
+    for(int i=0; i<k; i++){
+        dp[1<<i][i] = 1;
+    }
 
     for(int s=0; s<(1<<k); s++){
         for(int i=0; i<k; i++){
-            if((s>>i&1)==0) continue;
-            if((1<<i) == s){
-                dp[s][i][i] = 1;
-            }
             for(int j=0; j<k; j++){
-                if(s>>j&1) continue;
-                for(int l=0; l<k; l++){
-                    if((s>>l&1)==0) continue;
-                    dp[s|(1<<j)][i][j] = min(dp[s|(1<<j)][i][j], dp[s][i][l] + dist[l][j]);
-                }
+                dp[s|(1<<i)][i] = min(dp[s|(1<<i)][i], dp[s][j] + dist[j][i]);
             }
-            dbg(s, i, dp[s][i]);
         }
     }
 
     int ans = 1e9;
     for(int i=0; i<k; i++){
-        for(int j=0; j<k; j++){
-            ans = min(ans, dp[(1<<k)-1][i][j]);
-        }
+        ans = min(ans, dp[(1<<k)-1][i]);
     }
 
     if(ans == 1e9){
