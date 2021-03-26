@@ -1,15 +1,17 @@
 #include<bits/stdc++.h>
 
 // Extended Euclid's greatest common divisor algorithm
-// Find (x, y, g)
-// where $a*x + b*y = g$ and g is the greatest common divisor of (a, b)
+// Find (x, y)
+// where
+//   - a*x + b*y = gcd(a, b)$
 long long ext_gcd(long long a, long long b, long long &x, long long &y){
 	if(b == 0){
 		x = 1; y = 0; return a;
 	}
 	long long nx, ny;
 	long long g = ext_gcd(b, a%b, nx, ny);
-	x = ny; y = nx - a/b *ny;
+	x = ny;
+	y = nx - a / b * ny;
 	return g;
 }
 
