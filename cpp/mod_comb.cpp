@@ -35,7 +35,7 @@ struct modint {
 	friend modint<m> operator+(const ll l, modint<m> r) { r+=l; return r; }
 	friend modint<m> operator-(modint<m> l, const modint<m> r) { l-=r; return l; }
 	friend modint<m> operator-(modint<m> l, const ll r) { l-=r; return l; }
-	friend modint<m> operator-(const ll l, modint<m> r) { r-=l; return r; }
+	friend modint<m> operator-(const ll l, modint<m> r) { r*=-1; r+=l; return r; }
 	friend modint<m> operator*(modint<m> l, const modint<m> r) { l*=r; return l; }
 	friend modint<m> operator*(modint<m> l, const ll r) { l*=r; return l; }
 	friend modint<m> operator*(const ll l, modint<m> r) { r*=l; return r; }
