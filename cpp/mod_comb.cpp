@@ -61,10 +61,13 @@ struct modint {
 	}
 };
 
-template<long long m=1000000007>
+using mint = modint<>;
+
+template<typename mint = mint>
 struct Comb {
 	typedef long long ll;
-	std::vector<modint<m>> fact, fact_inv;
+	const ll m = mint::mod();
+	std::vector<mint> fact, fact_inv;
 	Comb(int n_max=2000005) {
 		fact.assign(n_max, 0);
 		fact_inv.assign(n_max, 0);
@@ -75,7 +78,7 @@ struct Comb {
 			fact_inv[i] = fact[i].inv();
 		}
 	}
-	modint<m> operator() (ll n, ll k) const {
+	mint operator() (ll n, ll k) const {
 		if(n < m){
 			return fact[n] * fact_inv[k] * fact_inv[n-k];
 		} else {
@@ -99,15 +102,15 @@ struct Comb {
 // From the facts:
 //   (p-1)! = p-1 (mod p) (c.f. Willson's theorem)
 //   (p-2)**2 = 1 (mod p)
-	modint<m> fact_ext(ll n, ll &e) const {
+	mint fact_ext(ll n, ll &e) const {
 		if(n == 0){
 			e = 0;
-			return modint<m>(1);
+			return mint(1);
 		}
 
-		modint<m> na = fact_ext(n/m, e);
+		mint na = fact_ext(n/m, e);
 		e += n/m;
-		modint<m> a = na * fact[n%m];
+		mint a = na * fact[n%m];
 		if((n/m)%2) a = a * (m-1);
 		return a;
 	}
@@ -116,15 +119,13 @@ struct Comb {
 // (n, m) = n!/(n-m)!m!
 //        = (a_n * p^(e_n)) / ((a_{n-m} * p^(e_{n-m}) * (a_m * p^e_m))
 //        = a_n / (a_{n-m} * a_m) * p^(e_n - e_{n-m} - e_m)
-	modint<m> comb_ext (ll n, ll k) const {
+	mint comb_ext (ll n, ll k) const {
 		ll e1,e2,e3;
-		modint<m> a1 = fact_ext(n, e1);
-		modint<m> a2 = fact_ext(k, e2);
-		modint<m> a3 = fact_ext(n-k, e3);
+		mint a1 = fact_ext(n, e1);
+		mint a2 = fact_ext(k, e2);
+		mint a3 = fact_ext(n-k, e3);
 
 		if(e1 > e2+e3) return 0;
 		else return a1*(a2*a3).inv();
 	}
 };
-
-using mint = modint<>;
