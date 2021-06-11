@@ -83,7 +83,7 @@ constexpr int find_primitive_root(int m){
 }
 
 template<long long m>
-constexpr mint<m> primitive_root = mint<m>(find_primitive_root(m));
+constexpr modint<m> primitive_root = modint<m>(find_primitive_root(m));
 
 int bsf(unsigned long long x){
     return __builtin_ctz(x);
@@ -220,7 +220,7 @@ std::vector<mint> convolution(std::vector<mint> a, std::vector<mint> b){
 
 template<long long mod = 998244353>
 std::vector<long long> convolution(std::vector<long long> a, std::vector<long long> b){
-    using mi = mint<mod>;
+    using mi = modint<mod>;
     std::vector<mi> a2(a.size()), b2(b.size());
     for(int i=0; i<a.size(); i++) a2[i] = mi(a[i]);
     for(int i=0; i<b.size(); i++) b2[i] = mi(b[i]);

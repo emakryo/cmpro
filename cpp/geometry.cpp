@@ -23,6 +23,12 @@ struct Point {
 	bool operator< (const Point &o) { return x<o.x || (x==o.x && y<o.y); };
 };
 
+template<typename T>
+std::ostream& operator<<(std::ostream &os, Point<T> &p){
+    os << "(" << p.x << ", " << p.y << ")";
+    return os;
+}
+
 typedef Point<long long> PLL;
 std::vector<PLL> convex_hull(std::vector<PLL> &points){
 	int n = points.size();

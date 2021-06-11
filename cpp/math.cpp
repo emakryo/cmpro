@@ -1,5 +1,10 @@
 #include<bits/stdc++.h>
 
+// @param n `0 <= n <= 1e9`
+// @param m `1 <= m <= 1e9`
+// @param a `0 <= a`
+// @param b `0 <= b`
+// @return \sum_{i=0}^{n-1} floor((a*i+b)/m)
 long long floor_sum(long long n, long long m, long long a, long long b) {
     long long ans = 0;
     if (a >= m) {
