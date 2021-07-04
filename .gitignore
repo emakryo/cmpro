@@ -9,3 +9,4 @@ out_*.txt
 metadata.json
 /.vscode/*
 !/.vscode/cpp.code-snippets
+!/.vscode/rust.code-snippets

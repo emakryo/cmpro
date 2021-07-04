@@ -1,13 +1,17 @@
-[package]
-name = "cmpro"
-version = "0.1.0"
-authors = ["Ryosuke Kamesawa <ryosuke.kamesawa@dena.com>"]
-
-[dependencies]
-
-[lib]
-path = "rs/lib.rs"
-
-[[bin]]
-path = "rs/template.rs"
-name = "template"
+[workspace]
+members = [
+    "src/tenkei90",
+    "src/arc110",
+    "src/abc195",
+    "src/abc205",
+    "src/ahc004",
+    "src/abc207",
+    "src/agc054",
+    "src/acl1",
+    "src/tenka1_2015_qualA",
+    "src/arc116",
+    "src/tenka1_2015_qualB",
+    "src/past202104",
+    "src/past202107",
+    "src/abc208",
+]
