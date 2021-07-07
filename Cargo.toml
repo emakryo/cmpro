@@ -14,4 +14,6 @@ members = [
     "src/past202104",
     "src/past202107",
     "src/abc208",
+    "src/nikkei2019_final",
+    "src/arc120",
 ]
