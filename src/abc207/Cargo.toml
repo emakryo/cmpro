@@ -1,7 +1,7 @@
 [package]
 name = "abc207"
 version = "0.1.0"
-authors = ["Ryosuke Kamesawa <ryosuke.kamesawa@dena.com>"]
+authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 
 [dependencies]

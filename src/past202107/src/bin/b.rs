@@ -1,4 +1,4 @@
-#![allow(unused_macros, unused_imports)]
+#![allow(unused_macros)]
 macro_rules! dbg {
     ($($xs:expr),+) => {
         #[cfg(debug_assertions)]
@@ -8,6 +8,10 @@ macro_rules! dbg {
 
 fn main() {
     proconio::input!{
-        
+        a: f64,
+        b: f64,
+        c: f64,
     }
+
+    println!("{}", c.min(a/b));
 }

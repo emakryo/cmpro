@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "rs",
     "src/tenkei90",
     "src/arc110",
     "src/abc195",
@@ -16,4 +17,17 @@ members = [
     "src/abc208",
     "src/nikkei2019_final",
     "src/arc120",
+    "src/indeednow_qualb",
+    "src/code_formula_2014_final",
+    "src/abc209",
+    "src/dp",
+    "src/abc133",
+    "src/arc101",
+    "src/abc037",
+    "src/abc210",
+    "src/arc123",
+    "src/arc115",
+    "src/past202010",
+    "src/agc14",
+    "src/agc53",
 ]
