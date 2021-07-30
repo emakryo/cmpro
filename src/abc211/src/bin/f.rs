@@ -1,95 +1,188 @@
-#![allow(unused_imports)]
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
 
 fn main() {
-    proconio::input! {
-        r: usize,
-        g: usize,
-        b: usize,
-        k: usize,
-        x: usize,
-        y: usize,
-        z: usize,
+    proconio::input!{
+        n: usize,
     }
 
-    let s = k - y;
-    let t = k - z;
-    let u = k - x;
+    let mut es = vec![];
 
-    let c = Combination::<ModInt998244353>::new(500000);
-
-    let rs: Vec<_> = (0..(k+1)).map(|i| if i < s { 0.into() } else { c.calc(r, i) }).collect();
-    let gs: Vec<_> = (0..(k+1)).map(|i| if i < t { 0.into() } else { c.calc(g, i) }).collect();
-    let bs: Vec<_> = (0..(k+1)).map(|i| if i < u { 0.into() } else { c.calc(b, i) }).collect();
-
-    let rg = convolution(&rs, &gs);
-
-    let mut ans = ModInt998244353::from(0);
-    for i in 0..(k+1) {
-        ans += rg[i] * bs[k-i];
-    }
-
-    println!("{}", ans);
-}
-
-#[derive(Debug)]
-pub struct Combination<M> {
-    fact: Vec<M>,
-    fact_inv: Vec<M>,
-}
-
-impl<M: ModIntBase> Combination<M> {
-    fn new(n_max: usize) -> Self {
-        let mut fact = vec![M::from(1); n_max];
-        let mut fact_inv = vec![M::from(1); n_max];
-        for i in 2..n_max {
-            fact[i] = fact[i-1] * i.into();
-            fact_inv[i] = fact[i].inv();
+    for _ in 0..n {
+        proconio::input! {
+            m: usize,
+            ps: [(i64, i64); m],
         }
 
-        Self {
-            fact,
-            fact_inv,
+        es.push(ps);
+    }
+
+    proconio::input!{
+        q: usize,
+        mut qs: [(i64, i64); q],
+    }
+
+    let lim = 100005;
+
+    struct AddSum;
+    impl MapMonoid for AddSum {
+        type F = i64;
+        type M = Additive<i64>;
+        fn identity_map() -> Self::F {
+            0
+        }
+        fn composition(f: &Self::F, g: &Self::F) -> Self::F {
+            *f+*g
+        }
+        fn mapping(f: &Self::F, x: &i64) -> i64 {
+            *f+*x
         }
     }
 
-    fn calc(&self, n: usize, k: usize) -> M {
-        if n < k {
-            0.into()
-        } else if n < self.fact.len() {
-            self.fact[n] * self.fact_inv[k] * self.fact_inv[n-k]
+    type St = LazySegtree<AddSum>;
+
+    let mut xs = vec![];
+
+    for mut es in es {
+        let m = es.len();
+
+        // find lower-leftmost vertex
+        let mut p = (i64::max_value(), i64::max_value());
+        let mut k = 0;
+
+        for (i, &(x, y)) in es.iter().enumerate() {
+            if (x, y) < p {
+                p = (x, y);
+                k = i;
+            }
+        }
+        
+        // make clockwise and lower-leftmost vertex to be at 0-index
+        if k % 2 == 0 {
+            es.rotate_left(k);
         } else {
-            self.comb_ext(n, k)
+            es.reverse();
+            es.rotate_left(m-k-1);
+        }
+        assert!(p == es[0]);
+
+        // keep addition/subtraction of y-axis range for each x
+        for i in (0..m).step_by(2) {
+            if es[i].1 < es[i+1].1 {
+                xs.push((es[i].0, 1, es[i].1, es[i+1].1));
+            } else {
+                xs.push((es[i].0, -1, es[i+1].1, es[i].1));
+            }
         }
     }
 
-    fn fact_ext(&self, n: usize, e: &mut usize) -> M {
-        if n == 0 {
-            *e = 0;
-            return 1.into();
-        }
+    xs.sort();
 
-        let m = todo!();
-        let na = self.fact_ext(n / m, e);
-        *e += n / m;
-        let mut a = na * self.fact[n%m];
-        if n/m%2 == 1 {
-            a *= (m-1).into();
+    let mut qs: Vec<_> = qs.into_iter().enumerate().map(|(x, y)| (y, x)).collect();
+    qs.sort();
+
+    let mut k = 0;
+    let mut ans = vec![0; q];
+
+    let mut st = St::new(lim);
+
+    for ((x, y), i) in qs {
+        while k < xs.len() && xs[k].0 <= x {
+            let (_, a, l, r) = dbg!(xs[k]);
+            st.apply_range(l as usize, r as usize, a);
+            k += 1;
         }
-        a
+        ans[i] = st.get(y as usize);
     }
 
-    fn comb_ext(&self, n: usize, k: usize) -> M {
-        let (mut e1, mut e2, mut e3) = (0, 0, 0);
-        let (a1, a2, a3) = (self.fact_ext(n, &mut e1), self.fact_ext(k, &mut e2), self.fact_ext(n-k, &mut e3));
-        if e1 > e2 + e3 {
-            0.into()
-        } else {
-            a1 * (a2 * a3).inv()
-        }
+    for a in ans {
+        println!("{}", a);
     }
 }
 
+pub mod combination {
+    use crate::modint::ModIntBase;
 
+    #[derive(Debug)]
+    pub struct Combination<M> {
+        fact: Vec<M>,
+        fact_inv: Vec<M>,
+    }
+
+    impl<M: ModIntBase> Combination<M> {
+        pub fn new(n_max: usize) -> Self {
+            let n = n_max.min(M::modulus() as usize);
+            let mut fact = vec![M::from(1); n];
+            let mut fact_inv = vec![M::from(1); n];
+            for i in 2..n {
+                fact[i] = fact[i - 1] * i.into();
+                fact_inv[i] = fact[i].inv();
+            }
+
+            Self { fact, fact_inv }
+        }
+
+        pub fn calc(&self, n: usize, k: usize) -> M {
+            if n < k {
+                0.into()
+            } else if n < self.fact.len() {
+                self.fact[n] * self.fact_inv[k] * self.fact_inv[n - k]
+            } else {
+                self.comb_ext(n, k)
+            }
+        }
+
+        fn fact_ext(&self, n: usize, e: &mut usize) -> M {
+            if n == 0 {
+                *e = 0;
+                return 1.into();
+            }
+
+            let m = self.fact.len();
+            let na = self.fact_ext(n / m, e);
+            *e += n / m;
+            let mut a = na * self.fact[n % m];
+            if n / m % 2 == 1 {
+                a *= (m - 1).into();
+            }
+            a
+        }
+
+        fn comb_ext(&self, n: usize, k: usize) -> M {
+            let (mut e1, mut e2, mut e3) = (0, 0, 0);
+            let (a1, a2, a3) = (
+                self.fact_ext(n, &mut e1),
+                self.fact_ext(k, &mut e2),
+                self.fact_ext(n - k, &mut e3),
+            );
+            if e1 > e2 + e3 {
+                0.into()
+            } else {
+                a1 * (a2 * a3).inv()
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use crate::Combination;
+        use crate::ModInt1000000007;
+
+        #[test]
+        fn test_combination() {
+            let comb = Combination::<ModInt1000000007>::new(200000);
+            assert_eq!(comb.calc(10, 5), ModInt1000000007::from(252));
+        }
+    }
+}
 pub mod convolution {
     macro_rules! modulus {
     ($($name:ident),*) => {
@@ -1995,6 +2088,102 @@ pub mod lazysegtree {
                     );
                 }
             }
+        }
+    }
+}
+pub mod lca {
+    pub struct LcaTree<W> {
+        g: Vec<Vec<(usize, W)>>,
+        depth: Vec<usize>,
+        pars: Vec<Vec<usize>>,
+        dist: Vec<W>,
+    }
+
+    impl<W: crate::internal_type_traits::Integral> LcaTree<W> {
+        pub fn new(g: Vec<Vec<(usize, W)>>) -> Self {
+            Self::new_with_root(g, 0)
+        }
+
+        pub fn new_with_root(g: Vec<Vec<(usize, W)>>, root: usize) -> Self {
+            let n = g.len();
+            assert!(root < n);
+            fn dfs<W: crate::internal_type_traits::Integral>(
+                u: usize,
+                p: Option<usize>,
+                par: &mut Vec<usize>,
+                depth: &mut Vec<usize>,
+                dist: &mut Vec<W>,
+                g: &Vec<Vec<(usize, W)>>,
+            ) {
+                for &(v, c) in &g[u] {
+                    if Some(v) == p {
+                        continue;
+                    }
+                    par[v] = u;
+                    depth[v] = depth[u] + 1;
+                    dist[v] = dist[u] + c;
+                    dfs(v, Some(u), par, depth, dist, g);
+                }
+            }
+            let mut par = vec![root; n];
+            let mut depth = vec![0; n];
+            let mut dist = vec![W::zero(); n];
+
+            dfs(root, None, &mut par, &mut depth, &mut dist, &g);
+            let mut k = 0;
+            while (1 << k) < n {
+                k += 1;
+            }
+
+            let mut pars = vec![vec![0; n]; k];
+            pars[0] = par;
+            for i in 0..k - 1 {
+                for u in 0..n {
+                    pars[i + 1][u] = pars[i][pars[i][u]];
+                }
+            }
+
+            Self {
+                g,
+                depth,
+                pars,
+                dist,
+            }
+        }
+
+        pub fn lca(&self, u: usize, v: usize) -> usize {
+            let n = self.g.len();
+            assert!(u < n && v < n);
+            let (mut u, mut v) = if self.depth[u] < self.depth[v] {
+                (u, v)
+            } else {
+                (v, u)
+            };
+
+            let d = self.depth[v] - self.depth[u];
+            for i in 0..self.pars.len() {
+                if d >> i & 1 == 1 {
+                    v = self.pars[i][v];
+                }
+            }
+
+            if v == u {
+                return v;
+            }
+
+            for i in (0..self.pars.len()).rev() {
+                if self.pars[i][u] != self.pars[i][v] {
+                    u = self.pars[i][u];
+                    v = self.pars[i][v];
+                }
+            }
+
+            return self.pars[0][u];
+        }
+
+        pub fn dist(&self, u: usize, v: usize) -> W {
+            let l = self.lca(u, v);
+            return self.dist[u] + self.dist[v] - (W::one() + W::one()) * self.dist[l];
         }
     }
 }
@@ -4919,10 +5108,14 @@ pub mod twosat {
         }
     }
 }
+use std::collections::{BTreeMap, HashMap};
+
+use combination::*;
 use convolution::*;
 use dsu::*;
 use fenwicktree::*;
 use lazysegtree::*;
+use lca::*;
 use math::*;
 use maxflow::*;
 use mincostflow::*;

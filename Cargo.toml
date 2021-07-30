@@ -30,4 +30,9 @@ members = [
     "src/past202010",
     "src/agc14",
     "src/agc53",
+    "src/code_formula_2014_qualA",
+    "src/abc211",
+    "src/keyence2021",
+    "src/agc21",
+    "src/arc124",
 ]
