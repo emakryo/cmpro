@@ -35,4 +35,9 @@ members = [
     "src/keyence2021",
     "src/agc21",
     "src/arc124",
+    "src/agc050",
+    "src/arc097",
+    "src/abc212",
+    "src/jsc2021",
+    "src/abc206",
 ]
