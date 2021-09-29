@@ -23,7 +23,7 @@ fn main() {
         g[a].push(b);
         g[b].push(a);
     }
-    let mut h = vec![vec![]; n];
+    let mut h = vec![vec![]; n]; // 各頂点から高次数(>lim)な頂点へ向かう辺
     for i in 0..n {
         for &v in &g[i] {
             if g[v].len() > lim {
