@@ -47,9 +47,6 @@ fn main() {
         }
         js[i+1] = (k+1) as usize;
     }
-    dbg!(&x);
-
-    dbg!(&js);
 
     let mut dp = vec![Mint::from(0); n+1];
     for i in 0..n {
