@@ -72,6 +72,22 @@ members = [
     "src/yukicoder315",
     "src/arc127",
     "src/facebook2021_r2",
+    "src/abc220",
+    "src/yukicoder316",
+    "src/abc221",
+    "tmp",
+    "src/abc222",
+    "src/arc128",
+    "src/cfr749",
+    "src/abc223",
+    "src/yukicoder319",
+    "src/pg_battle2021",
+    "src/agc20",
+    "src/codefes2017final",
+    "src/abc224",
+    "src/abc225",
+    "src/future2022qual",
+    "src/future2022qual/tools",
 ]
 
 [profile.release]
