@@ -1,3 +1,16 @@
+#![allow(unused_macros, unused_imports)]
+
+use std::iter::FromIterator;
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -40,10 +53,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -100,4 +110,101 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        if let Some(x) = solve() {
+            println!("{}", x);
+        } else {
+            println!("IMPOSSIBLE");
+        }
+    }
+}
+
+fn solve() -> Option<String> {
+    input! {
+        n: usize,
+        s: [Bytes; n],
+    }
+
+    let c = 26;
+    let mut t = vec![(None, None); c];
+    let mut u = vec![0; c];
+
+    for (i, si) in s.iter().enumerate() {
+        if si.iter().all(|x| x == &si[0]) {
+            u[(si[0] - b'A') as usize] += si.len();
+        } else {
+            let a = (si[0] - b'A') as usize;
+            let b = (*si.last().unwrap() - b'A') as usize;
+            if t[a].1.is_some() || t[b].0.is_some() {
+                return None;
+            }
+            t[a].1 = Some(i);
+            t[b].0 = Some(i);
+        }
+    }
+
+    let mut k = None;
+    let mut ans: Vec<u8> = vec![];
+    while !t.is_empty() {
+        // dbg!(&t);
+        let mut ok = false;
+        for i in 0..t.len() {
+            if t[i].0.is_none() && t[i].1.is_none() {
+                t.remove(i);
+                ok = true;
+                break;
+            } else if k == t[i].0 {
+                ok = true;
+                if t[i].1.is_some() {
+                    k = t[i].1;
+                    let a = s[k.unwrap()][0];
+                    ans.extend(std::iter::repeat(a).take(u[(a-b'A') as usize]));
+                    u[(a-b'A') as usize] = 0;
+                    ans.extend(s[k.unwrap()].iter());
+                    t.remove(i);
+                    break;
+                } else {
+                    let a = *s[k.unwrap()].last().unwrap();
+                    ans.extend(std::iter::repeat(a).take(u[(a-b'A') as usize]));
+                    u[(a-b'A') as usize] = 0;
+                    k = None;
+                    t.remove(i);
+                    break;
+                }
+            }
+        }
+        if !ok {
+            return None;
+        }
+    }
+
+    for (i, &ui) in u.iter().enumerate() {
+        if ui > 0 {
+            ans.extend(std::iter::repeat(i as u8 + b'A').take(ui));
+        }
+    }
+
+    let mut f = vec![false; c];
+
+    for i in 0..ans.len()-1 {
+        if ans[i] != ans[i+1] {
+            if f[(ans[i+1] - b'A') as usize] {
+                return None;
+            }
+            f[(ans[i] - b'A') as usize] = true;
+        }
+    }
+    if f[(*ans.last().unwrap() - b'A') as usize] {
+        return None;
+    }
+
+    Some(String::from_iter(ans.into_iter().map(|c| c as char)))
 }

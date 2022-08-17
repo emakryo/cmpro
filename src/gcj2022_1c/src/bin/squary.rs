@@ -1,3 +1,14 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -40,10 +51,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -99,5 +107,47 @@ pub mod input {
                 self.next()
             }
         }
+    }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input! {
+        n: usize,
+        k: usize,
+        e: [i64; n],
+    }
+
+    let a = e.iter().map(|x| x.pow(2)).sum::<i64>();
+    let b = e.iter().sum::<i64>();
+    if k == 1 {
+        if b == 0 {
+            if a == b.pow(2) {
+                println!("0");
+            } else {
+                println!("IMPOSSIBLE");
+            }
+        } else if (a - b.pow(2)) % (2 * b) == 0 {
+            let x = (a - b.pow(2)) / (2 * b);
+            println!("{}", x);
+            assert_eq!(a + x.pow(2), (b + x).pow(2));
+        } else {
+            println!("IMPOSSIBLE");
+        }
+    } else {
+        let x = 1 - b;
+        let y = (a - b.pow(2)) / 2 + b.pow(2) - b;
+        assert_eq!(a + x.pow(2) + y.pow(2), (b + x + y).pow(2));
+        println!("{} {}", x, y);
     }
 }

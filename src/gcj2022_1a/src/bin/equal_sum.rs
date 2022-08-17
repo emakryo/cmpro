@@ -1,3 +1,14 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -7,8 +18,8 @@ pub mod input {
         (read=$read:expr,$($r:tt)*)=>{
             let sc = input::SCANNER.with(|x| {
                 *x.borrow_mut() = input::Scanner::new($read);
-                Rc::clone(x)
-            })
+                std::rc::Rc::clone(x)
+            });
             input_inner!{sc.borrow_mut(),$($r)*}
         };
         ($($r:tt)*)=>{
@@ -40,10 +51,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -100,4 +108,69 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        read=input::stdin(false),
+        t: usize,
+    }
+
+    for _ in 0..t {
+        solve();
+    }
+}
+
+fn query(a: &[usize]) -> Vec<usize> {
+    for ai in a[..a.len()-1].iter() {
+        print!("{} ", *ai);
+    }
+    println!("{}", a[a.len()-1]);
+
+    input!{
+        b: [usize; a.len()]
+    }
+    b
+}
+
+fn solve() {
+    input! {
+        n: usize,
+    }
+    let mut a = (0..30).rev().map(|x| 1<<x).collect::<Vec<_>>();
+    for i in 0..(n-a.len()) {
+        a.push(1_000_000_000-i);
+    }
+    a.sort();
+    a.reverse();
+
+    assert!(a.iter().all(|&x| x <= 1_000_000_000));
+
+    let b = query(&a);
+
+    let s = a.iter().sum::<usize>() + b.iter().sum::<usize>();
+    let mut t = 0;
+
+    let mut ans = vec![];
+
+    for bi in b {
+        if t + bi <= s / 2 {
+            t += bi;
+            ans.push(bi);
+        }
+    }
+
+    for ai in a {
+        if t + ai <= s / 2 {
+            t += ai;
+            ans.push(ai);
+        }
+    }
+
+    assert_eq!(t, s / 2);
+
+    for x in ans[..ans.len()-1].iter() {
+        print!("{} ", *x);
+    }
+    println!("{}", ans[ans.len()-1]);
 }

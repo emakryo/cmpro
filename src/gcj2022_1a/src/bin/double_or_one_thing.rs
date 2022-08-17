@@ -1,3 +1,14 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -40,10 +51,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -100,4 +108,42 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input!{
+        s: Chars,
+    }
+
+    let mut ans = vec![];
+    let mut cur = 0;
+    while cur < s.len() {
+        let mut next = cur + 1;
+        while next < s.len() && s[cur] == s[next] {
+            next += 1;
+        }
+
+        while cur < next {
+            if next < s.len() && s[cur] < s[next] {
+                ans.push(s[cur]);
+                ans.push(s[cur]);
+            } else {
+                ans.push(s[cur]);
+            }
+            cur += 1;
+        }
+    }
+
+    println!("{}", ans.iter().collect::<String>());
 }

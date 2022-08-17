@@ -1,19 +1,26 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
-    use std::{cell::RefCell, io::Read, rc::Rc};
-    thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
+    use std::{cell::RefCell, io::Read};
 
     #[macro_export]
     macro_rules! input{
         (read=$read:expr,$($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| {
-                *x.borrow_mut() = input::Scanner::new($read);
-                Rc::clone(x)
-            })
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::new($read);
+            input_inner!{sc,$($r)*}
         };
         ($($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| std::rc::Rc::clone(x));
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::default();
+            input_inner!{sc,$($r)*}
         };
     }
 
@@ -40,10 +47,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -75,7 +79,7 @@ pub mod input {
     }
     impl Default for Scanner {
         fn default() -> Self {
-            Self::new(stdin(!cfg!(debug_assertions)))
+            Self::new(stdin(cfg!(debug_assertions)))
         }
     }
     impl Scanner {
@@ -98,6 +102,49 @@ pub mod input {
                 self.input = s.split_ascii_whitespace();
                 self.next()
             }
+        }
+    }
+}
+
+fn lower_bound(a: &[usize], x: usize) -> usize {
+    let mut lb = 0;
+    let mut ub = a.len();
+
+    if x <= a[0] {
+        return 0;
+    }
+
+    while ub - lb > 1 {
+        let m = (ub + lb) / 2;
+        if x <= a[m] {
+            ub = m;
+        } else {
+            lb = m;
+        }
+    }
+
+    ub
+}
+
+fn main() {
+    input!{
+        n: usize,
+        k: usize,
+        p: [[usize; 3]; n],
+    }
+
+    let s: Vec<usize> = p.into_iter().map(|x| x.iter().sum()).collect();
+    dbg!(&s);
+    let mut ss = s.clone();
+    ss.sort();
+
+    for si in s {
+        let j = lower_bound(&ss, si+301);
+        dbg!(n-j);
+        if n - j < k {
+            println!("Yes");
+        } else {
+            println!("No");
         }
     }
 }

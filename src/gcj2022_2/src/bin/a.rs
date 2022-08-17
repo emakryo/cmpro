@@ -1,3 +1,16 @@
+#![allow(unused_macros, unused_imports)]
+
+use std::{collections::HashSet, iter::FromIterator};
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -40,10 +53,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -99,5 +109,63 @@ pub mod input {
                 self.next()
             }
         }
+    }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input!{
+        n: usize,
+        k: usize,
+    }
+
+    let mut k = k;
+
+    let m = n / 2;
+    if k < 2 * m || k % 2 == 1 {
+        println!("IMPOSSIBLE");
+        return;
+    }
+
+    let mut ans = vec![];
+    let mut x = m;
+    let mut y = 0;
+
+    let v = move |x: usize, y: usize| -> usize {
+        n*n + 1 + 2 * x * y - (2*x+1)*(2*x+1)
+    };
+
+    while x > 0 {
+        if y < 3 && 2 * x <= k - 2 * x {
+            k -= 2 * x;
+            y += 1;
+        } else if y == 3 && 2 * (x-1) <= k - 2 * x {
+            k -= 2 * x;
+            y = 0;
+            x -= 1;
+        } else {
+            if v(x, y)+2 != v(x-1, y) {
+                ans.push((v(x, y)+1, v(x-1, y)));
+            }
+            k -= 2;
+            x -= 1;
+        }
+        // dbg!(x, y, k);
+    }
+    assert_eq!(k, 0);
+
+    println!("{}", ans.len());
+    for (u, v) in ans {
+        println!("{} {}", u, v);
     }
 }

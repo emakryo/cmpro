@@ -1,19 +1,27 @@
+#![allow(unused_macros, unused_imports)]
+
+use std::collections::BTreeSet;
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
 pub mod input {
-    use std::{cell::RefCell, io::Read, rc::Rc};
-    thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
+    use std::{cell::RefCell, io::Read};
 
     #[macro_export]
     macro_rules! input{
         (read=$read:expr,$($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| {
-                *x.borrow_mut() = input::Scanner::new($read);
-                Rc::clone(x)
-            })
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::new($read);
+            input_inner!{sc,$($r)*}
         };
         ($($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| std::rc::Rc::clone(x));
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::default();
+            input_inner!{sc,$($r)*}
         };
     }
 
@@ -40,10 +48,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -75,7 +80,7 @@ pub mod input {
     }
     impl Default for Scanner {
         fn default() -> Self {
-            Self::new(stdin(!cfg!(debug_assertions)))
+            Self::new(stdin(cfg!(debug_assertions)))
         }
     }
     impl Scanner {
@@ -98,6 +103,32 @@ pub mod input {
                 self.input = s.split_ascii_whitespace();
                 self.next()
             }
+        }
+    }
+}
+
+fn main() {
+    input!{
+        q: usize,
+        qs: [(usize, usize); q],
+    }
+
+    let n = 1usize << 20;
+    let mut a = vec![-1; n];
+    let mut b = (0..n).collect::<BTreeSet<_>>();
+
+    for (t, x) in qs {
+        if t == 1 {
+            let h = if let Some(h) = b.range((x % n)..).next() {
+                *h
+            } else {
+                *b.iter().next().unwrap()
+            };
+            b.remove(&h);
+
+            a[h] = x as i64;
+        } else {
+            println!("{}", a[x % n]);
         }
     }
 }

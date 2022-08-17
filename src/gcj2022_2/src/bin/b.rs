@@ -1,3 +1,16 @@
+#![allow(unused_macros, unused_imports)]
+
+use std::{collections::{HashSet, BTreeSet}, iter::FromIterator};
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -40,10 +53,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -100,4 +110,66 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input!{
+        r: i64,
+    }
+
+    todo!()
+}
+
+fn solve_small() {
+    input!{
+        r: i64,
+    }
+
+    let n = (2*r+1) as usize;
+    let mut xs = vec![vec![0; n]; n];
+
+    for x in 0..=r {
+        for y in 0..=r {
+            if ((x*x + y*y) as f64).sqrt().round() as i64 <= r {
+                xs[(r+x) as usize][(r+y) as usize] = 1;
+                xs[(r+x) as usize][(r-y) as usize] = 1;
+                xs[(r-x) as usize][(r+y) as usize] = 1;
+                xs[(r-x) as usize][(r-y) as usize] = 1;
+            }
+        }
+    }
+
+    for r0 in 0..=r {
+        for x in -r0..=r0 {
+            let y = ((r0*r0 - x*x) as f64).sqrt().round() as i64;
+            xs[(r+x) as usize][(r+y) as usize] |= 2;
+            xs[(r+x) as usize][(r-y) as usize] |= 2;
+            xs[(r+y) as usize][(r+x) as usize] |= 2;
+            xs[(r-y) as usize][(r+x) as usize] |= 2;
+        }
+    }
+
+    dbg!(&xs);
+
+    let mut ans = 0;
+    for x in 0..n {
+        for y in 0..n {
+            if xs[x][y] == 1 || xs[x][y] == 2 {
+                ans += 1;
+            }
+        }
+    }
+
+    println!("{}", ans);
 }

@@ -42,7 +42,7 @@ def create_snippets(source_files, out_file: Path, extension: str, scope: str):
 if __name__ == "__main__":
     create_snippets_dir(Path("./cpp"), Path(".vscode/cpp.code-snippets"), "cpp", "cpp")
     create_snippets([
-        # Path("all.rs"),
+        Path("rs/src/all.rs"),
         Path("rs/src/template.rs"),
         Path("rs/src/input.rs"),
     ], Path(".vscode/rust.code-snippets"), "rs", "rust")

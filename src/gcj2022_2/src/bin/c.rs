@@ -1,3 +1,16 @@
+#![allow(unused_macros, unused_imports)]
+
+use std::mem::swap;
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
@@ -29,7 +42,7 @@ pub mod input {
 
     #[macro_export]
     macro_rules! read_value{
-        ($sc:expr,($($t:tt),*))=>{($(read_value!($sc,$t)),*)};
+        ($sc:expr,($($t:tt),*))=>{($({read_value!($sc,$t)}),*)};
         ($sc:expr,[$t:tt;$len:expr])=>{
             (0..$len).map(|_|read_value!($sc,$t)).collect::<Vec<_>>()
         };
@@ -42,7 +55,7 @@ pub mod input {
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
         ($sc:expr,$t:ty)=>{{
             let mut sc = $sc;
-            $sc.next::<$t>()
+            sc.next::<$t>()
         }};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
@@ -100,4 +113,86 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input!{
+        n: usize,
+        ps: [(i64, i64); n],
+        qs: [(i64, i64); n+1],
+    }
+
+    let mut d = vec![vec![(0, 0); n+1]; n];
+
+    for i in 0..n {
+        for j in 0..n+1 {
+            d[i][j] = (-dist(ps[i], qs[j]), j);
+        }
+
+        d[i].sort();
+        d[i].reverse();
+    }
+    let mut ans = vec![];
+    if rec(n, 0, 0, &d, &mut ans) {
+        println!("POSSIBLE");
+        for (a, b) in ans {
+            println!("{} {}", a, b);
+        }
+    } else {
+        println!("IMPOSSIBLE");
+    }
+
+}
+
+fn dist(x: (i64, i64), y: (i64, i64)) -> i64 {
+    (x.0-y.0).pow(2) + (x.1 - y.1).pow(2)
+}
+
+fn rec(n: usize, mut s: usize, mut t: usize, d: &Vec<Vec<(i64, usize)>>, ans: &mut Vec<(usize, usize)>) -> bool {
+    if ans.len() == n {
+        return true;
+    }
+
+    for i in 0..n {
+        if s >> i & 1 == 1 {
+            continue;
+        }
+
+        let mut k = 0;
+        for j in 0..n {
+            if t >> d[i][j].1 & 1 == 1 {
+                continue;
+            }
+
+            k = d[i][j].1;
+            break;
+        }
+
+        if k != 0 {
+            s += 1 << i;
+            t += 1 << k;
+            ans.push((i+1, k+1));
+
+            if rec(n, s, t, d, ans) {
+                return true;
+            }
+
+            ans.pop();
+            t -= 1 << k;
+            s -= 1 << i;
+        }
+    }
+
+    return false;
 }

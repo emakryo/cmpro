@@ -1,19 +1,26 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
-    use std::{cell::RefCell, io::Read, rc::Rc};
-    thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
+    use std::{cell::RefCell, io::Read};
 
     #[macro_export]
     macro_rules! input{
         (read=$read:expr,$($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| {
-                *x.borrow_mut() = input::Scanner::new($read);
-                Rc::clone(x)
-            })
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::new($read);
+            input_inner!{sc,$($r)*}
         };
         ($($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| std::rc::Rc::clone(x));
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::default();
+            input_inner!{sc,$($r)*}
         };
     }
 
@@ -40,10 +47,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -100,4 +104,55 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        n: usize,
+        a: [u64; n],
+    }
+
+    let mut ok = 0.0;
+    let mut ng = 1e9;
+    for _ in 0..100 {
+        let x = (ok + ng) / 2.0;
+        let mut s = (0.0f64, 0.0f64);
+        for ai in &a {
+            let ai = *ai as f64 - x;
+            s = (ai + s.0.max(s.1), s.0);
+        }
+
+        if s.0.max(s.1) >= 0.0 {
+            ok = x;
+        } else {
+            ng = x;
+        }
+    }
+
+    println!("{}", ok);
+
+    let mut ok = 0;
+    let mut ng = 2_000_000_000;
+
+    while ng - ok > 1 {
+        let x = (ok + ng) / 2;
+        let mut s = (0, 0);
+        for ai in &a {
+            let ai = if *ai >= x {
+                1
+            } else {
+                -1
+            };
+
+            s = (ai + s.0.max(s.1), s.0);
+        }
+
+        if s.0.max(s.1) > 0 {
+            ok = x;
+        } else {
+            ng = x;
+        }
+    }
+
+    println!("{}", ok);
 }

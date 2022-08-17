@@ -1,5 +1,17 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
     use std::{cell::RefCell, io::Read, rc::Rc};
+
     thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
 
     #[macro_export]
@@ -19,8 +31,8 @@ pub mod input {
 
     #[macro_export]
     macro_rules! input_inner{
-        ($sc:expr)=>{};
-        ($sc:expr,)=>{};
+        ($sc:expr)=>{};  // w/o trailing comma
+        ($sc:expr,)=>{}; // w/ trailing comma
         ($sc:expr,$var:ident:$t:tt$($r:tt)*)=>{
             let $var=read_value!($sc,$t);
             input_inner!{$sc $($r)*}
@@ -40,10 +52,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -58,9 +67,9 @@ pub mod input {
         })
     }
     pub fn file<P: AsRef<std::path::Path>>(path: P) -> Box<dyn FnMut() -> String> {
-        thread_local!(static DONE: RefCell<bool> = RefCell::new(false));
         let path = path.as_ref().to_owned();
         Box::new(move || {
+            thread_local!(static DONE: RefCell<bool> = RefCell::new(false));
             DONE.with(|f| {
                 assert!(!*f.borrow(), "Insufficient input");
                 *f.borrow_mut() = true;
@@ -100,4 +109,34 @@ pub mod input {
             }
         }
     }
+}
+
+fn main() {
+    input!{
+        t: usize,
+    }
+
+    for i in 0..t {
+        print!("Case #{}: ", i+1);
+        solve();
+    }
+}
+
+fn solve() {
+    input! {
+        n: usize,
+        s: [i64; n],
+    }
+
+    let mut s = s;
+    s.sort();
+
+    let mut k = 0;
+    for x in s {
+        if k < x {
+            k += 1;
+        }
+    }
+
+    println!("{}", k);
 }

@@ -1,19 +1,26 @@
+#![allow(unused_macros, unused_imports)]
+macro_rules! dbg {
+    ($($xs:expr),+) => {
+        if cfg!(debug_assertions) {
+            std::dbg!($($xs),+)
+        } else {
+            ($($xs),+)
+        }
+    }
+}
+
 pub mod input {
-    use std::{cell::RefCell, io::Read, rc::Rc};
-    thread_local!(pub static SCANNER: Rc<RefCell<Scanner>> = Rc::new(RefCell::new(Scanner::default())));
+    use std::{cell::RefCell, io::Read};
 
     #[macro_export]
     macro_rules! input{
         (read=$read:expr,$($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| {
-                *x.borrow_mut() = input::Scanner::new($read);
-                Rc::clone(x)
-            })
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::new($read);
+            input_inner!{sc,$($r)*}
         };
         ($($r:tt)*)=>{
-            let sc = input::SCANNER.with(|x| std::rc::Rc::clone(x));
-            input_inner!{sc.borrow_mut(),$($r)*}
+            let mut sc = input::Scanner::default();
+            input_inner!{sc,$($r)*}
         };
     }
 
@@ -40,10 +47,7 @@ pub mod input {
         ($sc:expr,Chars)=>{read_value!($sc,String).chars().collect::<Vec<char>>()};
         ($sc:expr,Bytes)=>{read_value!($sc,String).bytes().collect::<Vec<u8>>()};
         ($sc:expr,Usize1)=>{read_value!($sc,usize)-1};
-        ($sc:expr,$t:ty)=>{{
-            let mut sc = $sc;
-            $sc.next::<$t>()
-        }};
+        ($sc:expr,$t:ty)=>{$sc.next::<$t>()};
     }
     pub fn stdin(buffered: bool) -> Box<dyn FnMut() -> String> {
         Box::new(move || {
@@ -99,5 +103,38 @@ pub mod input {
                 self.next()
             }
         }
+    }
+}
+
+fn main() {
+    input!{
+        t: usize,
+        cases: [(usize, usize); t],
+    }
+
+    for (i, case) in cases.into_iter().enumerate() {
+        println!("Case #{}:", i+1);
+        solve(case.0, case.1);
+    }
+}
+
+fn solve(r: usize, c: usize) {
+    let mut ans = vec![String::new(); 2*r+1];
+    for i in 0..2*r+1 {
+        for j in 0..2*c+1 {
+            if (i<2&&j<2) || (i%2==1 && j%2==1) {
+                ans[i].push('.');
+            } else if i%2==1 && j%2==0 {
+                ans[i].push('|');
+            } else if i%2==0 && j%2==1 {
+                ans[i].push('-');
+            } else {
+                ans[i].push('+');
+            }
+        }
+    }
+
+    for a in ans {
+        println!("{}", a);
     }
 }

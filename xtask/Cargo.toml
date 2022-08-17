@@ -1,0 +1,13 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
+edition = "2018"
+
+
+[dependencies]
+anyhow = "1.0.53"
+cargo-manifest = "0.2.6"
+structopt = "0.3.26"
+taplo = "0.7.0"
+toml = "0.5.8"
