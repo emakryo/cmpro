@@ -102,4 +102,8 @@ members = [
   "src/abc233",
   "src/abc231",
   "src/abc232",
+  "src/abc239",
+  "tmp",
+  "src/facebook2022_qual",
+  "src/facebook2022_r1",
 ]
