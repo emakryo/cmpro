@@ -1,15 +1,20 @@
-use std::path::PathBuf;
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
 use cargo_manifest::Manifest;
+use std::{io::Read, path::PathBuf};
 use structopt::StructOpt;
-
 
 #[derive(StructOpt)]
 enum Xtask {
     /// Create template.
     Template {
         /// Name of contest.
-        name: String
+        name: String,
+    },
+    /// Compress Rust file
+    Compress {
+        /// Whther to apply rustfmt to output, default output is minified
+        #[structopt(short, long)]
+        format: bool,
     },
 }
 
@@ -18,6 +23,7 @@ fn main() -> Result<()> {
 
     match opt {
         Xtask::Template { name } => template(name),
+        Xtask::Compress { format } => compress(format),
     }
 }
 
@@ -56,7 +62,24 @@ fn template(name: String) -> Result<()> {
         members.push(package);
     }
 
-    std::fs::write(workspace_manifest_path, 
-        taplo::formatter::format(&toml::to_string(&workspace_manifest)?, taplo::formatter::Options::default()))?;
+    std::fs::write(
+        workspace_manifest_path,
+        taplo::formatter::format(
+            &toml::to_string(&workspace_manifest)?,
+            taplo::formatter::Options::default(),
+        ),
+    )?;
+    Ok(())
+}
+
+fn compress(format: bool) -> Result<()> {
+    let mut stdin = std::io::stdin().lock();
+    let mut buf = String::new();
+    stdin.read_to_string(&mut buf)?;
+
+    let out = xtask::compress(&buf, format)?;
+
+    println!("{}", out);
+
     Ok(())
 }

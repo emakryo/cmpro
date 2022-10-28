@@ -11,3 +11,7 @@ cargo-manifest = "0.2.6"
 structopt = "0.3.26"
 taplo = "0.7.0"
 toml = "0.5.8"
+
+syn = { version = "1.0.102", features = ["full", "extra-traits"] }
+quote = "1.0.21"
+itertools = "0.10.5"
