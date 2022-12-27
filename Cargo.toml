@@ -106,4 +106,6 @@ members = [
   "tmp",
   "src/facebook2022_qual",
   "src/facebook2022_r1",
+  "src/pg_battle2022",
+  "src/abc237",
 ]
