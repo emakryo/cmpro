@@ -109,4 +109,6 @@ members = [
   "src/pg_battle2022",
   # "src/abc237",
   "src/facebook2022_r2",
+  "src/future-contest-2023-final",
+  "src/future-contest-2023-final/tools",
 ]

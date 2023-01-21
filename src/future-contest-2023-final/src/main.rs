@@ -1,5 +1,6 @@
-#![allow(unused_macros, unused_imports)]
-use std::f64::consts::{TAU, PI};
+#![allow(unused_macros, unused_imports, unused)]
+use std::f64::consts::PI;
+const TAU: f64 = 2.0 * PI;
 
 use std::io::{Read, BufRead};
 macro_rules! dbg {
@@ -15,7 +16,7 @@ macro_rules! dbg {
 fn read_sigma<R: BufRead>(mut rdr: R) -> f64 {
     let mut buf = String::new();
     rdr.read_line(&mut buf).expect("read_sigma: failed to read line");
-    let buf = buf.strip_suffix("\n").expect("read_sigma: no newline");
+    let buf = buf.trim_end_matches('\n');
 
     buf.parse::<f64>().expect("read_sigma: failed to parse")
 }
@@ -58,7 +59,7 @@ impl Response {
 fn read_response<R: BufRead>(mut rdr: R) -> Response {
     let mut buf = String::new();
     rdr.read_line(&mut buf).expect("read_response: failed to read line");
-    let buf = buf.strip_suffix("\n").expect("read_response: no newline");
+    let buf = buf.trim_end_matches('\n');
 
     let mut it = buf.split_ascii_whitespace();
 
@@ -84,7 +85,8 @@ fn read_response<R: BufRead>(mut rdr: R) -> Response {
 }
 
 fn main() {
-    let mut rdr = std::io::stdin().lock();
+    let stdin = std::io::stdin();
+    let mut rdr = stdin.lock();
     let sigma = read_sigma(&mut rdr);
 
     let n_query = 1000;
@@ -166,7 +168,7 @@ impl State {
     }
 
     fn d(&self, msg: &str) {
-        if self.turn < 50 {
+        if self.turn < 0 {
             eprintln!("{}", msg);
         }
     }
@@ -200,48 +202,11 @@ impl State {
 
         self.not_found.push((q, r, 1e10));
 
-        let reset_thresh = 50000i64.pow(2);
-        let midpoint_thresh = 10000i64.pow(2);
-
-        self.next = match self.between {
-            [None, None] => {
-                self.between[0] = Some((q, r));
-                self.between_edge()
-            }
-            [Some((_, r0)), None] if r0.same_dir(&r) => {
-                self.between[0] = Some((q, r));
-                self.between_edge()
-            }
-            [Some((q0, r0)), None] if r0.opposite_dir(&r) => {
-                self.between[1] = Some((q, r));
-                q0.midpoint(&q)
-            }
-            [Some((q0, r0)), None] if reset_thresh < q0.dist2(&q) => {
-                q0.midpoint(&q)
-            }
-            [Some(_), None] => {
-                self.between[0] = Some((q, r));
-                self.between_edge()
-            }
-            [Some((q0, r0)), Some((q1, r1))]
-            if r0.same_dir(&r) && midpoint_thresh < q1.dist2(&q) => {
-                self.between = [Some((q1, r1)), Some((q, r))];
-                q1.midpoint(&q)
-            }
-            [Some((q0, r0)), Some((q1, r1))]
-            if r1.same_dir(&r) && midpoint_thresh < q0.dist2(&q) => {
-                self.between[1] = Some((q, r));
-                q0.midpoint(&q)
-            }
-            [Some((q0, r0)), Some((q1, r1))] => {
-                self.between = [Some((q, r)), None];
-                
-                let d = (q0.dist2(&q1) as f64).sqrt();
-                q.mov(r.dir(), d / 4.0)
-
-            }
-            [None, Some(_)] => unreachable!()
-        };
+        if self.not_found.len() < 10000 {
+            self.next = self.next_from_between(q, r);
+        } else {
+            self.next = todo!();
+        }
 
     }
 
@@ -255,11 +220,12 @@ impl State {
         let b = x0 * t0.cos() + y0 * t0.sin();
         let c = x0 * x0 + y0 * y0 - rad * rad;
         let (_, k) = solve_quad2(1.0, b, c);
+        let k = k - 10.0;
 
         let x1 = x0 + k * t0.cos();
         let y1 = y0 + k * t0.sin();
 
-        assert!((x1*x1 + y1*y1 - rad*rad).abs() < 1000.0);
+        assert!((x1*x1 + y1*y1 - rad*rad).abs() / (rad * rad) < 1e-4);
         Query {x: x1 as i64, y: y1 as i64}.midpoint(&q)
     }
 
@@ -303,6 +269,67 @@ impl State {
 
         diff / self.sigma
     }
+
+    fn next_from_between(&mut self, q: Query, r: Response) -> Query {
+        let reset_thresh = 30_000_000i64.pow(2);
+        let midpoint_thresh = 5_000_000i64.pow(2);
+
+        match self.between {
+            [None, None] => {
+                self.between[0] = Some((q, r));
+                self.between_edge()
+            }
+            [Some((_, r0)), None] if r0.same_dir(&r) => {
+                self.between[0] = Some((q, r));
+                self.between_edge()
+            }
+            [Some((q0, r0)), None] if r0.opposite_dir(&r) => {
+                self.between[1] = Some((q, r));
+                q0.midpoint(&q)
+            }
+            [Some((q0, r0)), None] if reset_thresh < q0.dist2(&q) => {
+                q0.midpoint(&q)
+            }
+            [Some(_), None] => {
+                self.between[0] = Some((q, r));
+                self.between_edge()
+            }
+            [Some((q0, r0)), Some((q1, r1))]
+            if r0.same_dir(&r) && midpoint_thresh < q1.dist2(&q) => {
+                self.between = [Some((q1, r1)), Some((q, r))];
+                q1.midpoint(&q)
+            }
+            [Some((q0, r0)), Some((q1, r1))]
+            if r1.same_dir(&r) && midpoint_thresh < q0.dist2(&q) => {
+                self.between[1] = Some((q, r));
+                q0.midpoint(&q)
+            }
+            [Some((q0, r0)), Some((q1, r1))] => {
+                self.between = [Some((q, r)), None];
+                
+                let d = (q0.dist2(&q1) as f64).sqrt();
+                q.mov(r.dir(), d / 4.0)
+
+            }
+            [None, Some(_)] => unreachable!()
+        }
+    }
+
+    fn next_from_groups(&mut self, q: Query, r: Response) -> Query {
+        let mut cands = vec![];
+        for i in 0..self.not_found.len() {
+            for j in i+1..self.not_found.len() {
+                let a = self.not_found[i];
+                let b = self.not_found[j];
+                if let Some(d) = disjoint(a.0, a.1, b.0, b.1) {
+                    cands.push(d);
+                }
+            }
+        }
+
+        todo!()
+    }
+
 }
 
 fn erf(x: f64) -> f64 {
